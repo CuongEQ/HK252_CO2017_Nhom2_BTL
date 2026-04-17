@@ -1,0 +1,244 @@
+\documentclass[a4paper]{article}
+
+%----Layout and color settings----
+\usepackage{geometry} % Set page margins
+%\usepackage{multicol}
+\setlength{\columnseprule}{1pt} % Set column separation line thickness
+%\usepackage{pdflscape}
+%\setlength{\parskip}{3pt} % Set paragraph spacing
+\usepackage{setspace}
+\setlength{\headheight}{24pt}
+%\setstretch{1.5} % Set line spacing
+\usepackage{indentfirst}
+%\usepackage{seqsplit}
+\usepackage{fancyhdr}
+\fancypagestyle{default}{ % Default page style
+      \fancyhf{}
+      \fancyhead[L]{
+            \includegraphics[height=20pt]{BK_logo.png}
+            \begin{minipage}[b]{0.75\textwidth}
+                  \raggedright \texttt{\small
+                  Trường Đại học Bách Khoa TPHCM \\
+                  Khoa Khoa học và Kỹ thuật Máy tính
+                  }
+            \end{minipage}
+      }
+      \fancyhead[R]{\small \begin{tabular}[b]{r} % Update according to document title
+            \texttt{Báo cáo bài tập buổi 7} \\
+            \texttt{Lập trình nâng cao - CO2039}
+            \end{tabular}}
+      \fancyfoot[R]{\texttt{Trang \thepage}}
+}
+\pagestyle{default} % Set default page style
+\usepackage{xcolor}
+\definecolor{minted}{rgb}{0.95,0.95,0.95} % For code blocks
+%----Locale and Font settings----
+\usepackage[vietnamese]{babel}
+\usepackage{fontspec}
+\newfontfamily\mintedfont{JetBrains Mono} % For code blocks
+%----Hyperlinks----
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}
+%----Math----
+\usepackage{amsmath}
+\usepackage{amssymb}
+%----Flowcharts----
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning}
+\tikzstyle{client} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=blue!30]
+\tikzstyle{context} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=green!30]
+\tikzstyle{strategy} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=orange!30]
+\tikzstyle{concrete} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=yellow!30]
+\tikzstyle{aggregation} = [diamond, draw=black]
+\tikzstyle{implementation} = [dashed, ->, >=stealth]
+\tikzstyle{association} = [->, >=stealth]
+%----Tables----
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage{booktabs}
+%----Figures----
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{boxedminipage}
+%----Code blocks----
+\usepackage{minted}
+\setminted{bgcolor=minted,autogobble,linenos,breaklines,formatcom=\mintedfont}
+%----Notebox----
+\usepackage{awesomebox}
+
+\begin{document}
+\begin{titlepage}
+    \begin{center}
+        \textbf{\large ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH} \\
+        \textbf{\large TRƯỜNG ĐẠI HỌC BÁCH KHOA} \\
+        \includegraphics[width=0.8\textwidth]{BK_logo.png} \\
+        \textbf{\Huge BÁO CÁO BÀI TẬP BUỔI 7 \\ CODE SMELLS} \\
+
+        \vfill
+
+        \Large{\begin{tabular}{ll}
+                \textbf{Họ và tên:}  & Nguyễn Minh Cường     \\
+                \textbf{MSSV:}       & 2410432               \\
+                \textbf{Nhóm lớp:}   & L01                   \\
+                \textbf{Giảng viên:} & Trần Trương Tuấn Phát \\
+            \end{tabular}}
+
+        \vfill
+
+        \textbf{TPHCM, 03 - 2026}
+    \end{center}
+\end{titlepage}
+
+\tableofcontents
+\pagebreak
+
+\section{Bloaters: Data Clumps}
+\subsection{Mã nguồn ví dụ}
+\begin{minted}{java}
+public class CustomerService {
+    public void addCustomer(String name, String street, String city, String zipCode) { }
+    public void updateAddress(String customerId, String street, String city, String zipCode) { }
+}
+\end{minted}
+
+\subsection{Giải pháp}
+\begin{minted}{java}
+public class Address {
+    private String street, city, zipCode;
+    // Constructor, getters, setters
+}
+
+public class CustomerService {
+    public void addCustomer(String name, Address address) { }
+    public void updateAddress(String customerId, Address address) { }
+}
+\end{minted}
+
+\subsection{Giải thích}
+Data Clumps xảy ra khi các nhóm dữ liệu liên quan được sử dụng cùng nhau ở nhiều nơi trong code mà không có một cấu trúc rõ ràng để đại diện cho chúng. Điều này làm cho code trở nên khó hiểu và dễ bị lỗi khi cần thay đổi. Bằng cách tạo \mintinline{java}|class Address|, chúng ta đã nhóm các thuộc tính liên quan lại với nhau, làm cho code dễ đọc hơn và dễ bảo trì hơn.
+
+\section{Object-Oriented Abusers: Switch Statements}
+\subsection{Mã nguồn ví dụ}
+\begin{minted}{java}
+public class Payroll {
+    public double calculatePay(Employee emp) {
+        switch (emp.getType()) {
+            case "MANAGER": return emp.getBaseSalary() + 5000;
+            case "DEVELOPER": return emp.getBaseSalary() + 2000;
+            default: return emp.getBaseSalary();
+        }
+    }
+}
+\end{minted}
+
+\subsection{Giải pháp}
+\begin{minted}{java}
+public abstract class Employee {
+    protected double baseSalary;
+    public abstract double calculatePay();
+}
+
+public class Manager extends Employee {
+    public double calculatePay() { return baseSalary + 5000; }
+}
+
+public class Developer extends Employee {
+    public double calculatePay() { return baseSalary + 2000; }
+}
+\end{minted}
+
+\subsection{Giải thích}
+Switch Statements thường được sử dụng để xử lý các trường hợp khác nhau dựa trên một thuộc tính của đối tượng. Điều này vi phạm nguyên tắc OOP vì nó làm cho code trở nên cứng nhắc và khó mở rộng. Bằng cách sử dụng kế thừa và đa hình, chúng ta có thể loại bỏ switch statement và cho phép mỗi lớp con tự xử lý logic tính toán của mình, làm cho code dễ bảo trì và mở rộng hơn.
+
+\section{Change Preventers: Divergent Change}
+\subsection{Mã nguồn ví dụ}
+\begin{minted}{java}
+public class Report {
+    public void generateData() { /* Logic tổng hợp dữ liệu */ }
+    public void printReport() { /* Logic định dạng văn bản */ }
+    public void exportToPDF() { /* Logic xuất file PDF */ }
+}
+\end{minted}
+
+\subsection{Giải pháp}
+\begin{minted}{java}
+public class ReportData {
+    public void generateData() { /* Logic tổng hợp dữ liệu */ }
+}
+
+public class ReportPrinter {
+    public void print(ReportData data) { /* Logic định dạng văn bản */ }
+}
+
+public class ReportExporter {
+    public void exportToPDF(ReportData data) { /* Logic xuất file PDF */ }
+}
+\end{minted}
+
+\subsection{Giải thích}
+Divergent Change xảy ra khi một lớp phải thay đổi vì nhiều lý do khác nhau, thường là do nó chứa nhiều chức năng. Điều này làm cho code trở nên khó bảo trì và dễ bị lỗi khi cần thay đổi. Bằng cách tách các chức năng khác nhau thành các lớp riêng biệt, chúng ta có thể giảm sự phụ thuộc giữa các phần của code và làm cho nó dễ bảo trì hơn.
+
+\section{Dispensables: Data Class}
+\subsection{Mã nguồn ví dụ}
+\begin{minted}{java}
+public class Rectangle {
+    public double width;
+    public double height;
+    // Getters and Setters
+}
+
+public class AreaCalculator {
+    public double calculateArea(Rectangle rect) {
+        return rect.getWidth() * rect.getHeight();
+    }
+}
+\end{minted}
+
+\subsection{Giải pháp}
+\begin{minted}{java}
+public class Rectangle {
+    private double width;
+    private double height;
+    
+    public double getArea() {
+        return width * height;
+    }
+}
+\end{minted}
+
+\subsection{Giải thích}
+Data Class là những lớp chỉ chứa dữ liệu mà không có logic nào liên quan đến dữ liệu đó. Điều này làm cho code trở nên rời rạc và khó sử dụng. Bằng cách thêm phương thức \mintinline{java}|double getArea()| vào \mintinline{java}|class Rectangle|, chúng ta đã kết hợp dữ liệu và logic liên quan lại với nhau, làm cho code dễ sử dụng hơn và tuân thủ nguyên tắc OOP hơn.
+
+\section{Couplers: Feature Envy}
+\subsection{Mã nguồn ví dụ}
+\begin{minted}{java}
+public class Order {
+    private double weight;
+    private double distance;
+    // Getters
+}
+
+public class ShippingCalculator {
+    public double getShippingCost(Order order) {
+        // Feature Envy: Gọi liên tục vào Order
+        return order.getWeight() * order.getDistance() * 1.5; 
+    }
+}     
+\end{minted}
+
+\subsection{Giải pháp}
+\begin{minted}{java}
+public class Order {
+    private double weight;
+    private double distance;
+
+    public double getShippingCost() {
+        return this.weight * this.distance * 1.5;
+    }
+}
+\end{minted}
+
+\subsection{Giải thích}
+Feature Envy xảy ra khi một phương thức trong một lớp thường xuyên truy cập vào dữ liệu của một lớp khác hơn là dữ liệu của chính nó. Điều này làm cho code trở nên phụ thuộc và khó bảo trì. Bằng cách di chuyển logic tính toán chi phí vận chuyển vào \mintinline{java}|class Order|, chúng ta đã giảm sự phụ thuộc giữa các lớp và làm cho code dễ bảo trì hơn.
+\end{document}
