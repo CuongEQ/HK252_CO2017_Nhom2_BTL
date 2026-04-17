@@ -50,6 +50,7 @@ Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với
 - Đẩy thay đổi lên nhánh remote (GitHub): `git push origin feature/[name]`
 
 Sau khi đã hoàn thành toàn bộ công việc được phân công, tiến hành vào Repo và tạo Pull Request (PR) từ nhánh làm việc sang nhánh `development` và chờ Nhóm trưởng duyệt nội dung.
+
 **⚠️ Cảnh báo:** NGHIÊM CẤM việc sử dụng lệnh `git force push` để ép hợp nhất mã nguồn khi bị lỗi.
 
 ## Giấy phép (License)
