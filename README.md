@@ -1,55 +1,46 @@
-# Bài tập lớn Hệ điều hành (CO2017) - HK252
-Đây là Repo dùng để lưu mã nguồn và lịch sử commit phục vụ làm việc song song giữa các thành viên trong nhóm nhằm giải quyết BTL này
+# Module: Memory Management (Quản lý bộ nhớ)
 
-## Phân chia công việc
-Mỗi thành viên được phân công 1 công việc tương ứng với 1 nhánh (branch) cụ thể như sau:
-- Nguyễn Minh Cường (2410432): 
-- Hân Trần ()
-- Thảo Ly ()
-- Trang ()
-- Lê Minh Anh ()
+## Tóm tắt công việc
+Quản lý cấp phát/giải phóng vùng nhớ cho tiến trình và cài đặt cơ chế Swapping (hoán đổi trang giữa RAM và ổ cứng ảo).
 
-## Cấu trúc của Repo
-### Cấu trúc của mã nguồn
-Mã nguồn của BTL được cấu trúc thành các nhóm tệp với chức năng riêng biệt như sau:
+## 1. Các tệp cần làm việc
+* `src/mm.c`: Logic phân trang và quản lý vùng nhớ chính.
+* `src/mm-vm.c`: Xử lý giới hạn vùng nhớ ảo.
+* `src/mm-memphy.c`: Thao tác trực tiếp với RAM và SWAP.
 
-| Header Files | Source Files | Description |
-| :--- | :--- | :--- |
-| `timer.h` | `timer.c` | Defines/implements the system timer. |
-| `cpu.h` | `cpu.c` | Virtual CPU implementation. |
-| `queue.h` | `queue.c` | (Priority) queue operations for PCBs. |
-| `sched.h` | `sched.c` | Scheduler functions. |
-| `common.h` | `os.c` | Structs, functions, and main entry point. |
-| `mm.h`, `mm64.h` | `mm.c`, `mm64.c` | Paging-based memory management. |
-| `syscall.h` |`syscall.c` | System call headers and implementation. |
+## 2. Cấu trúc Page Table Entry (PTE)
+* Dữ liệu 32-bit. Bạn cần dùng các phép bitwise (`&`, `|`, `>>`, `<<`) để thao tác:
+  * Bit 31: Cờ Present (1 = có trên RAM, 0 = không có).
+  * Bit 30: Cờ Swapped (1 = đang ở SWAP).
+  * Bit 0-12: Chứa Page Frame Number (FPN) nếu đang trên RAM.
+  * Bit 5-25: Chứa Swap Offset (Vị trí trên SWAP) nếu bị hoán đổi.
 
-### Cấu trúc của các nhánh (Branch)
-Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với nhiều mục đích/nhiệm vụ khác nhau bao gồm:
-- `main`: Nhánh chính, là sản phẩm cuối cùng đã được kiểm tra, dùng để nộp cho giảng viên.
-- `development`: Nhánh phát triển, là nhánh nhận các yêu cầu gộp (Merge) của các thành viên, dùng để kiểm tra trước khi đẩy (Push) lên nhánh `main`.
-- `feature/[name]`: Nhánh công việc, tương ứng với 1 công việc được phân công hiện thực. Miêu tả công việc xem chi tiết tệp `README.md` ở từng nhánh (Branch).
-- `report`: Nhánh công việc, tương ứng với công việc soạn báo cáo LaTeX.
+## 3. Luồng xử lý chi tiết (Trích từ Figure 7)
+**ℹ️ Câu hỏi 1:** What is the primary motivation for combining segmentation with paging in memory manage
+ment? How does this hybrid approach address limitations inherent in using either technique alone?
 
-## Quy trình làm việc
-### Khởi tạo nhánh lần đầu tiên
-- Cấu hình git remote (GitHub): `git remote add origin https://github.com/CuongEQ/HK252_CO2017_Nhom2_BTL.git`
-- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout develop && git pull origin development`
-- Tạo nhánh làm việc cá nhân: `git checkout -b feature/[name]`
-- Hiện thực theo yêu cầu và tự kiểm thử.
-- Chuyển toàn bộ nhánh cục bộ (Local) vào hàng chờ git: `git add.`
-- Commit toàn bộ thay đổi với lời nhắn: `git commit -m "[Lời nhắn ở đây]"`
-- Đẩy thay đổi lên nhánh remote (GitHub): `git push -u origin feature/[name]`
+**ℹ️ Câu hỏi 2:** What are the benefits of extending hierarchical paging to N level?
 
-### Sau khi đã có nhánh cục bộ (Local)
-**⚠️ Cảnh báo:** Với mỗi lần làm việc cần đồng bộ mã nguồn mới và hợp nhất (Merge). Không chịu trách nhiệm cho trường hợp hợp nhất lỗi do mã nguồn đã quá lỗi thời. 
-- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout develop && git pull origin development`
-- Quay về nhánh làm việc cá nhân và hợp nhất 2 mã nguồn: `git checkout feature/[name] && git merge develop`
-- Hiện thực theo yêu cầu và tự kiểm thử.
-- Chuyển toàn bộ nhánh cục bộ (Local) vào hàng chờ git: `git add.`
-- Commit toàn bộ thay đổi với lời nhắn: `git commit -m "[Lời nhắn ở đây]"`
-- Đẩy thay đổi lên nhánh remote (GitHub): `git push origin feature/[name]`
+**A. Lệnh `ALLOC` (Cấp phát)**
+1. Tìm một vùng nhớ rỗng trong `vm_freerg_list` (Danh sách các vùng nhớ rỗng).
+2. Nếu tìm thấy: Lấy vùng nhớ đó và trả về.
+3. Nếu không tìm thấy (hết vùng rỗng):
+   * Gọi system call `MEMINC` để nới rộng giới hạn bộ nhớ (`sbrk`).
+   * Lấy vùng nhớ mới tạo ra ở giới hạn mới (`NEW LIMIT`).
 
-Sau khi đã hoàn thành toàn bộ công việc được phân công, tiến hành vào Repo và tạo Pull Request (PR) từ nhánh làm việc sang nhánh `development` và chờ Nhóm trưởng duyệt nội dung.
+**B. Lệnh `FREE` (Giải phóng)**
+* Không xóa vật lý ngay. Chỉ cần lấy `vm_rg_struct` (Vùng nhớ rỗng) vừa được giải phóng và nối nó vào danh sách `vm_freerg_list` để tái sử dụng cho lệnh `ALLOC` sau này.
+
+**C. Lệnh `READ` / `WRITE` và Swapping**
+1. Lấy Page chứa địa chỉ cần đọc/ghi. Kiểm tra cờ `Present` (Thông qua bit 31).
+2. **Nếu Page Present (Trang đang ở trên RAM):** Lấy Frame Number (FPN) và tiến hành truy xuất vật lý bằng `MEMIO`.
+3. **Nếu Page NOT Present (Trang đang nằm dưới ổ SWAP):**
+   * Phát sinh Page Fault. Gọi system call `MEMSWP`.
+   * Tìm một Frame rỗng trên RAM. Nếu RAM đầy, tìm một Victim Page trên RAM và chuyển xuống SWAP (`SWAP COPY FROM RAM TO SWP`).
+   * Nạp trang đang cần từ SWAP lên Frame rỗng vừa có trên RAM (`SWAP COPY FROM SWP TO RAM`).
+   * Lấy FPN mới và thực hiện lệnh `READ`/`WRITE`.
+
+**ℹ️ Câu hỏi 3:** What are the advantages and disadvantages of paging and contiguous memory allocation?
 
 ## Giấy phép (License)
 Khung mã nguồn mẫu thuộc bản quyền của các giảng viên có tham gia hiện thực thuộc trường Đại học Bách Khoa TPHCM (HCMUT) - Khoa Khoa học và Kĩ thuật máy tính (CSE). Giấy phép được cấp cho các sinh viên đang học môn Hệ điều hành (CO2017) với mục đích học tập.
