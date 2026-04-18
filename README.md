@@ -1,55 +1,32 @@
-# Bài tập lớn Hệ điều hành (CO2017) - HK252
-Đây là Repo dùng để lưu mã nguồn và lịch sử commit phục vụ làm việc song song giữa các thành viên trong nhóm nhằm giải quyết BTL này
+# Module: Scheduler (Bộ định thời CPU)
 
-## Phân chia công việc
-Mỗi thành viên được phân công 1 công việc tương ứng với 1 nhánh (branch) cụ thể như sau:
-- Nguyễn Minh Cường (2410432): 
-- Hân Trần ()
-- Thảo Ly ()
-- Trang ()
-- Lê Minh Anh ()
+## Tóm tắt công việc
+Quản lý việc lập lịch tiến trình bằng thuật toán **Multi-Level Queue (MLQ)** và đảm bảo an toàn luồng (synchronization) trên môi trường đa lõi (Multi-CPU).
 
-## Cấu trúc của Repo
-### Cấu trúc của mã nguồn
-Mã nguồn của BTL được cấu trúc thành các nhóm tệp với chức năng riêng biệt như sau:
+## 1. Các tệp cần làm việc
+* `src/queue.c`: Xử lý hàng đợi ưu tiên.
+* `src/sched.c`: Xử lý logic chọn tiến trình cho CPU.
 
-| Header Files | Source Files | Description |
-| :--- | :--- | :--- |
-| `timer.h` | `timer.c` | Defines/implements the system timer. |
-| `cpu.h` | `cpu.c` | Virtual CPU implementation. |
-| `queue.h` | `queue.c` | (Priority) queue operations for PCBs. |
-| `sched.h` | `sched.c` | Scheduler functions. |
-| `common.h` | `os.c` | Structs, functions, and main entry point. |
-| `mm.h`, `mm64.h` | `mm.c`, `mm64.c` | Paging-based memory management. |
-| `syscall.h` |`syscall.c` | System call headers and implementation. |
+## 2. Thông số kỹ thuật MLQ (Phải tuân thủ)
+* **Số lượng hàng đợi ưu tiên:** `MAX_PRIO = 140` (từ mức 0 đến 139). Ưu tiên cao nhất là `prio = 0`.
+* **Công thức Slot (Khe thời gian):** Mỗi hàng đợi có một số lượng slot cố định để sử dụng CPU trước khi bị bắt buộc chuyển sang hàng đợi tiếp theo.
+  * `slot = MAX_PRIO - prio`
+  * *Ví dụ:* Queue `prio = 0` có 140 slots. Queue `prio = 139` có 1 slot.
+* **Quy tắc duyệt hàng đợi:** Phải duyệt qua danh sách các hàng đợi ưu tiên theo số bước/slot cố định này. Khi một hàng đợi xài hết slot, hệ thống chuyển sang hàng đợi của mức ưu tiên tiếp theo dù hàng đợi cũ vẫn còn tiến trình.
 
-### Cấu trúc của các nhánh (Branch)
-Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với nhiều mục đích/nhiệm vụ khác nhau bao gồm:
-- `main`: Nhánh chính, là sản phẩm cuối cùng đã được kiểm tra, dùng để nộp cho giảng viên.
-- `development`: Nhánh phát triển, là nhánh nhận các yêu cầu gộp (Merge) của các thành viên, dùng để kiểm tra trước khi đẩy (Push) lên nhánh `main`.
-- `feature/[name]`: Nhánh công việc, tương ứng với 1 công việc được phân công hiện thực. Miêu tả công việc xem chi tiết tệp `README.md` ở từng nhánh (Branch).
-- `report`: Nhánh công việc, tương ứng với công việc soạn báo cáo LaTeX.
+## 3. Hướng dẫn từng bước (Step-by-step)
 
-## Quy trình làm việc
-### Khởi tạo nhánh lần đầu tiên
-- Cấu hình git remote (GitHub): `git remote add origin https://github.com/CuongEQ/HK252_CO2017_Nhom2_BTL.git`
-- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout develop && git pull origin development`
-- Tạo nhánh làm việc cá nhân: `git checkout -b feature/[name]`
-- Hiện thực theo yêu cầu và tự kiểm thử.
-- Chuyển toàn bộ nhánh cục bộ (Local) vào hàng chờ git: `git add.`
-- Commit toàn bộ thay đổi với lời nhắn: `git commit -m "[Lời nhắn ở đây]"`
-- Đẩy thay đổi lên nhánh remote (GitHub): `git push -u origin feature/[name]`
+**Bước 1: Hoàn thiện `queue.c`**
+* Viết hàm `enqueue()`: Chèn một PCB (`struct pcb_t`) vào đúng vị trí cuối của `queue_t` được chỉ định. Đảm bảo cập nhật kích thước hàng đợi.
+* Viết hàm `dequeue()`: Lấy PCB ở đầu hàng đợi ra ngoài và trả về con trỏ đến PCB đó.
 
-### Sau khi đã có nhánh cục bộ (Local)
-**⚠️ Cảnh báo:** Với mỗi lần làm việc cần đồng bộ mã nguồn mới và hợp nhất (Merge). Không chịu trách nhiệm cho trường hợp hợp nhất lỗi do mã nguồn đã quá lỗi thời. 
-- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout develop && git pull origin development`
-- Quay về nhánh làm việc cá nhân và hợp nhất 2 mã nguồn: `git checkout feature/[name] && git merge develop`
-- Hiện thực theo yêu cầu và tự kiểm thử.
-- Chuyển toàn bộ nhánh cục bộ (Local) vào hàng chờ git: `git add.`
-- Commit toàn bộ thay đổi với lời nhắn: `git commit -m "[Lời nhắn ở đây]"`
-- Đẩy thay đổi lên nhánh remote (GitHub): `git push origin feature/[name]`
+**Bước 2: Hoàn thiện `sched.c`**
+* Tìm hàm `get_proc()`: Viết logic lấy tiến trình tiếp theo.
+* Duyệt mảng `mlq_ready_queue`. Kiểm tra xem hàng đợi hiện tại còn tiến trình và còn slot hay không.
+* Nếu còn, gọi `dequeue()` và trừ đi 1 slot của hàng đợi đó.
+* Nếu hết slot hoặc hết tiến trình, reset lại số slot của hàng đợi đó và nhảy sang hàng đợi ưu tiên thấp hơn tiếp theo.
 
-Sau khi đã hoàn thành toàn bộ công việc được phân công, tiến hành vào Repo và tạo Pull Request (PR) từ nhánh làm việc sang nhánh `development` và chờ Nhóm trưởng duyệt nội dung.
+**ℹ️ Trả lời câu hỏi:** Considering the impactness of MLQ detailed policies, what is the benefit of each policy?
 
 ## Giấy phép (License)
 Khung mã nguồn mẫu thuộc bản quyền của các giảng viên có tham gia hiện thực thuộc trường Đại học Bách Khoa TPHCM (HCMUT) - Khoa Khoa học và Kĩ thuật máy tính (CSE). Giấy phép được cấp cho các sinh viên đang học môn Hệ điều hành (CO2017) với mục đích học tập.
