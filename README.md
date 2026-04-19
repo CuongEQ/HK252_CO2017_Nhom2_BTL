@@ -13,5 +13,7 @@ Xây dựng cầu nối System Call giữa User Space và Kernel Space. Bổ sun
 * Mục 1.6 (How to Write the Kernel Interface): Ứng dụng gọi thông qua thư viện `libstd`, tham số phải được đóng gói qua `struct sc_regs`.
 * Mục 1.6.2 (The system call): Syscall 17 (`memmap`) phải được ánh xạ để gọi đúng các handler tương ứng: `SYSMEM_MAP_OP`, `SYSMEM_INC_OP`, `SYSMEM_SWP_OP`, `SYSMEM_IO_READ`, `SYSMEM_IO_WRITE`.
 
+**⚠️Lưu ý:** Toàn bộ mã nguồn được hiện thực cần phải tuân thủ Coding Style GNU được đề cập ở [đây](https://www.gnu.org/prep/standards/standards.html). Khi push thay đổi lên nhánh `development` sẽ có công cụ kiểm tra yếu tố này.
+
 ## Giấy phép
 Khung mã nguồn mẫu thuộc bản quyền của các giảng viên có tham gia hiện thực thuộc trường Đại học Bách Khoa TPHCM (HCMUT) - Khoa Khoa học và Kĩ thuật máy tính (CSE). Giấy phép được cấp cho các sinh viên đang học môn Hệ điều hành (CO2017) với mục đích học tập.
