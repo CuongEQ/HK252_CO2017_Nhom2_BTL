@@ -42,8 +42,8 @@ Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với
 
 ### Sau khi đã có nhánh cục bộ (Local)
 **⚠️ Cảnh báo:** Với mỗi lần làm việc cần đồng bộ mã nguồn mới và hợp nhất (Merge). Không chịu trách nhiệm cho trường hợp hợp nhất lỗi do mã nguồn đã quá lỗi thời. 
-- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout develop && git pull origin development`
-- Quay về nhánh làm việc cá nhân và hợp nhất 2 mã nguồn: `git checkout feature/[name] && git merge develop`
+- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout development && git pull origin development`
+- Quay về nhánh làm việc cá nhân và hợp nhất 2 mã nguồn: `git checkout feature/[name] && git merge development`
 - Hiện thực theo yêu cầu và tự kiểm thử.
 - Chuyển toàn bộ nhánh cục bộ (Local) vào hàng chờ git: `git add.`
 - Commit toàn bộ thay đổi với lời nhắn: `git commit -m "[Lời nhắn ở đây]"`
@@ -52,6 +52,9 @@ Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với
 Sau khi đã hoàn thành toàn bộ công việc được phân công, tiến hành vào Repo và tạo Pull Request (PR) từ nhánh làm việc sang nhánh `development` và chờ Nhóm trưởng duyệt nội dung.
 
 **⚠️ Cảnh báo:** NGHIÊM CẤM việc sử dụng lệnh `git force push` để ép hợp nhất mã nguồn khi bị lỗi.
+
+### Các công việc trong báo cáo LaTeX
+Mỗi thành viên trả lời toàn bộ các câu hỏi và hoàn thành các yêu cầu cụ thể trong phần nội dung được phân công tại [đây](https://docs.google.com/document/d/1S8fYgDP6bGCTXm3XdoTbrI4CBD_PQ478BppXsM5i3kQ/edit?usp=sharing).
 
 ## Giấy phép (License)
 Khung mã nguồn mẫu thuộc bản quyền của các giảng viên có tham gia hiện thực thuộc trường Đại học Bách Khoa TPHCM (HCMUT) - Khoa Khoa học và Kĩ thuật máy tính (CSE). Giấy phép được cấp cho các sinh viên đang học môn Hệ điều hành (CO2017) với mục đích học tập.
