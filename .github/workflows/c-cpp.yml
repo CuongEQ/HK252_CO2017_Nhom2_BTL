@@ -16,16 +16,16 @@ jobs:
     - name: Thiết lập môi trường thực thi
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-          build-essential gcc # C/C++ build and compile tools \
-          make # Makefile support
+        sudo apt-get install -y
+          build-essential gcc \
+          make
 
     - name: Cài đặt các công cụ kiểm tra
       run: |
         sudo apt-get install -y \
-          clang-format # Code style checking tool \
-          cppcheck # Passive code check \
-          valgrind # Dynamic code check
+          clang-format \
+          cppcheck \
+          valgrind
 
     - name: Kiểm tra tuân thủ Coding style GNU trong các tệp liên quan đến System Call
       run: |
@@ -44,7 +44,7 @@ jobs:
     - name: Thực thi chương trình và Kiểm tra động
       run: |
         if [ -f "os" ]; then
-          valgrind --leak-check=full --error-exitcode=1 ./os sched # Run with sample config
+          valgrind --leak-check=full --error-exitcode=1 ./os sched
         else
           echo "Lỗi: Không tìm thấy tệp thực thi 'os'."
           exit 1
