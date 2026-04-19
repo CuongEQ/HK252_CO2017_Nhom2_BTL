@@ -1,0 +1,51 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "development" ]
+  pull_request:
+    branches: [ "development" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Thiết lập môi trường thực thi
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential gcc # C/C++ build and compile tools \
+          make # Makefile support
+
+    - name: Cài đặt các công cụ kiểm tra
+      run: |
+        sudo apt-get install -y \
+          clang-format # Code style checking tool \
+          cppcheck # Passive code check \
+          valgrind # Dynamic code check
+
+    - name: Kiểm tra tuân thủ Coding style GNU trong các tệp liên quan đến System Call
+      run: |
+        clang-format --style=GNU --dry-run -Werror \
+          src/syscall*.c \
+          src/sys_*.c
+
+    - name: Kiểm tra tĩnh (Passive) mã nguồn
+      run: |
+        cppcheck --enable=all --error-exitcode=1 --suppress=missingIncludeSystem src/
+    
+    - name: Biên dịch toàn bộ mã nguồn
+      run: |
+        make all
+
+    - name: Thực thi chương trình và Kiểm tra động
+      run: |
+        if [ -f "os" ]; then
+          valgrind --leak-check=full --error-exitcode=1 ./os sched # Run with sample config
+        else
+          echo "Lỗi: Không tìm thấy tệp thực thi 'os'."
+          exit 1
+        fi
