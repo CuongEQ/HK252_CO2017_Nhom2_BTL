@@ -4,7 +4,7 @@
 ## Phân chia công việc
 Mỗi thành viên được phân công 1 công việc tương ứng với 1 nhánh (branch) cụ thể như sau:
 - Nguyễn Minh Cường (2410432): 
-- Hân Trần ()
+- Trần Gia Hân (2052464)
 - Phạm Nguyễn Thảo Ly (2411995)
 - Trang ()
 - Lê Minh Anh ()
