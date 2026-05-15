@@ -1,4 +1,4 @@
-name: Kiểm tra tuân thủ Coding style GNU trong các tệp liên quan đến System Call
+name: GNU Coding Style Check
 
 on:
   push:
