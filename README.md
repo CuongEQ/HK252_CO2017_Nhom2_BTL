@@ -3,11 +3,11 @@
 
 ## Phân chia công việc
 Mỗi thành viên được phân công 1 công việc tương ứng với 1 nhánh (branch) cụ thể như sau:
-- Nguyễn Minh Cường (2410432): 
-- Trần Gia Hân (2052464)
-- Phạm Nguyễn Thảo Ly (2411995)
-- Lưu Bảo Trang (2413556)
-- Lê Minh Anh (2410089)
+- Nguyễn Minh Cường (2410432): `feature/syscall`
+- Trần Gia Hân (2052464): `feature/paging`
+- Phạm Nguyễn Thảo Ly (2411995): `feature/synchronization`
+- Lưu Bảo Trang (2413556): `feature/scheduler`
+- Lê Minh Anh (2410089): `feature/memory`
 
 ## Cấu trúc của Repo
 ### Cấu trúc của mã nguồn
@@ -30,10 +30,11 @@ Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với
 - `feature/[name]`: Nhánh công việc, tương ứng với 1 công việc được phân công hiện thực. Miêu tả công việc xem chi tiết tệp `README.md` ở từng nhánh (Branch).
 - `report`: Nhánh công việc, tương ứng với công việc soạn báo cáo LaTeX.
 
-## Quy trình làm việc
+## Quy trình làm việc (Workflow)
 ### Khởi tạo nhánh lần đầu tiên
+- Cấu hình git ưu tiên Merge thay vì Rebase: `git config --global pull.rebase false`
 - Cấu hình git remote (GitHub): `git remote add origin https://github.com/CuongEQ/HK252_CO2017_Nhom2_BTL.git`
-- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout develop && git pull origin development`
+- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout -b develop && git pull origin development`
 - Tạo nhánh làm việc cá nhân: `git checkout -b feature/[name]`
 - Hiện thực theo yêu cầu và tự kiểm thử.
 - Chuyển toàn bộ nhánh cục bộ (Local) vào hàng chờ git: `git add.`
@@ -42,8 +43,7 @@ Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với
 
 ### Sau khi đã có nhánh cục bộ (Local)
 **⚠️ Cảnh báo:** Với mỗi lần làm việc cần đồng bộ mã nguồn mới và hợp nhất (Merge). Không chịu trách nhiệm cho trường hợp hợp nhất lỗi do mã nguồn đã quá lỗi thời. 
-- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout development && git pull origin development`
-- Quay về nhánh làm việc cá nhân và hợp nhất 2 mã nguồn: `git checkout feature/[name] && git merge development`
+- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout feature/[name] && git merge development`
 - Hiện thực theo yêu cầu và tự kiểm thử.
 - Chuyển toàn bộ nhánh cục bộ (Local) vào hàng chờ git: `git add.`
 - Commit toàn bộ thay đổi với lời nhắn: `git commit -m "[Lời nhắn ở đây]"`
