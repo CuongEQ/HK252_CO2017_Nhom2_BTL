@@ -3,9 +3,11 @@ name: Kiểm tra tuân thủ Coding style GNU trong các tệp liên quan đến
 on:
   push:
     branches: [ "feature/syscall" ]
+  pull_request:
+    branches: [ "development" ]
 
 jobs:
-  build:
+  gnu-style-check:
     runs-on: ubuntu-latest
 
     steps:
