@@ -118,7 +118,8 @@ __sys_memmap (struct krnl_t *krnl, uint32_t pid, struct sc_regs *regs)
     case SYSMEM_IO_WRITE:
       if (krnl->mram == NULL)
         return -1;
-      MEMPHY_write (krnl->mram, (addr_t)regs->a2, (BYTE)regs->a3);
+      if (MEMPHY_write (krnl->mram, (addr_t)regs->a2, (BYTE)regs->a3) != 0)
+        return -1;
       break;
     default: // Invalid memory operation code
       printf ("Memop code: %d\n", memop);
