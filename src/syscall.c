@@ -36,6 +36,9 @@ __sys_ni_syscall (struct krnl_t *krnl, struct sc_regs *regs)
    * in normal execution.
    */
 
+  (void) krnl;
+  (void) regs;
+
   return 0;
 }
 
