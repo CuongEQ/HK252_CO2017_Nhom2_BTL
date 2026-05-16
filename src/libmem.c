@@ -724,8 +724,9 @@ int libkmem_copy_to_user(struct pcb_t *caller, uint32_t source, uint32_t destina
             return -1;
         }
     }
+    return 0;
 
-    return 1;
+    // return 1;
 }
 
 
