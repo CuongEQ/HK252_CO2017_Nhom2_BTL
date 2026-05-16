@@ -111,7 +111,8 @@ __sys_memmap (struct krnl_t *krnl, uint32_t pid, struct sc_regs *regs)
     case SYSMEM_IO_READ:
       if (krnl->mram == NULL)
         return -1;
-      MEMPHY_read (krnl->mram, (addr_t)regs->a2, &value);
+      if (MEMPHY_read (krnl->mram, (addr_t)regs->a2, &value) != 0)
+        return -1;
       regs->a3 = value;
       break;
     case SYSMEM_IO_WRITE:
