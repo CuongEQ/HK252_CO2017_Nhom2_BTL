@@ -54,4 +54,4 @@ _syscall (struct krnl_t *krnl, uint32_t pid, uint32_t nr, struct sc_regs *regs)
     default:
       return __sys_ni_syscall (krnl, regs);
     }
-};
+}
