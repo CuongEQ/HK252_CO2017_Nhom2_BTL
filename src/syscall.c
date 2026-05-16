@@ -11,7 +11,8 @@
 #include "syscall.h"
 #include "common.h"
 
-#define __SYSCALL(nr, sym) extern int __##sym(struct krnl_t *, uint32_t, struct sc_regs *);
+#define __SYSCALL(nr, sym)                                                    \
+  extern int __##sym (struct krnl_t *, uint32_t, struct sc_regs *);
 #include "syscalltbl.lst"
 #undef __SYSCALL
 
@@ -24,26 +25,29 @@ const char *sys_call_table[] = {
 #include "syscalltbl.lst"
 };
 #undef __SYSCALL
-const int syscall_table_size = sizeof(sys_call_table) / sizeof(char *);
+const int syscall_table_size = sizeof (sys_call_table) / sizeof (char *);
 
-int __sys_ni_syscall(struct krnl_t *krnl, struct sc_regs *regs)
+int
+__sys_ni_syscall (struct krnl_t *krnl, struct sc_regs *regs)
 {
-   /*
-    * DUMMY systemcall for unimplemented system calls, it should never be called in normal execution.
-    */
+  /*
+   * DUMMY systemcall for unimplemented system calls, it should never be called
+   * in normal execution.
+   */
 
-   return 0;
+  return 0;
 }
 
-#define __SYSCALL(nr, sym) \
-   case nr:                \
-      return __##sym(krnl, pid, regs);
-int _syscall(struct krnl_t *krnl, uint32_t pid, uint32_t nr, struct sc_regs *regs)
+#define __SYSCALL(nr, sym)                                                    \
+  case nr:                                                                    \
+    return __##sym (krnl, pid, regs);
+int
+_syscall (struct krnl_t *krnl, uint32_t pid, uint32_t nr, struct sc_regs *regs)
 {
-   switch (nr)
-   {
+  switch (nr)
+    {
 #include "syscalltbl.lst"
-   default:
-      return __sys_ni_syscall(krnl, regs);
-   }
+    default:
+      return __sys_ni_syscall (krnl, regs);
+    }
 };
