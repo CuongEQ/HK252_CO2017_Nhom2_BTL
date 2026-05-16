@@ -502,7 +502,7 @@ int libkmem_malloc(struct pcb_t * caller, uint32_t size, uint32_t reg_index)
         return -1;
     }
 
-  return 0;
+  return val;
 }
 
 
