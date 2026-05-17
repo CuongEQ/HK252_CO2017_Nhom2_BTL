@@ -25,8 +25,8 @@ const char *sys_call_table[] = {
 #include "syscalltbl.lst"
 };
 #undef __SYSCALL
-const int syscall_table_size =
-  sizeof (sys_call_table) / sizeof (sys_call_table[0]);
+const int syscall_table_size
+    = sizeof (sys_call_table) / sizeof (sys_call_table[0]);
 
 int
 __sys_ni_syscall (struct krnl_t *krnl, struct sc_regs *regs)
@@ -36,8 +36,8 @@ __sys_ni_syscall (struct krnl_t *krnl, struct sc_regs *regs)
    * in normal execution.
    */
 
-  (void) krnl;
-  (void) regs;
+  (void)krnl;
+  (void)regs;
 
   return 0;
 }
