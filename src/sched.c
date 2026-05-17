@@ -52,10 +52,10 @@ void init_scheduler(void) {
 
 #ifdef MLQ_SCHED
 /*
- *  Stateful design for routine calling
- *  based on the priority and our MLQ policy
- *  We implement stateful here using transition technique
- *  State representation   prio = 0 .. MAX_PRIO, curr_slot = 0..(MAX_PRIO -
+ * Stateful design for routine calling
+ * based on the priority and our MLQ policy
+ * We implement stateful here using transition technique
+ * State representation   prio = 0 .. MAX_PRIO, curr_slot = 0..(MAX_PRIO -
  * prio)
  */
 struct pcb_t *get_mlq_proc(void) {
@@ -65,7 +65,7 @@ struct pcb_t *get_mlq_proc(void) {
 
   int found = 0;
   /*TODO: get a process from PRIORITY [ready_queue].
-   *      It worth to protect by a mechanism.
+   * It worth to protect by a mechanism.
    * */
 
   for (int i = 0; i < MAX_PRIO; i++) {
@@ -104,7 +104,7 @@ void put_mlq_proc(struct pcb_t *proc) {
   proc->krnl->running_list = &running_list;
 
   /* TODO: put running proc to running_list
-   *       It worth to protect by a mechanism.
+   * It worth to protect by a mechanism.
    *
    */
 
@@ -120,7 +120,7 @@ void add_mlq_proc(struct pcb_t *proc) {
   proc->krnl->running_list = &running_list;
 
   /* TODO: put running proc to running_list
-   *       It worth to protect by a mechanism.
+   * It worth to protect by a mechanism.
    *
    */
 
@@ -129,18 +129,24 @@ void add_mlq_proc(struct pcb_t *proc) {
   pthread_mutex_unlock(&queue_lock);
 }
 
-struct pcb_t *get_proc(void) { return get_mlq_proc(); }
+struct pcb_t *get_proc(void) {
+  return get_mlq_proc();
+}
 
-void put_proc(struct pcb_t *proc) { put_mlq_proc(proc); }
+void put_proc(struct pcb_t *proc) {
+  put_mlq_proc(proc);
+}
 
-void add_proc(struct pcb_t *proc) { dd_mlq_proc(proc); }
+void add_proc(struct pcb_t *proc) {
+  add_mlq_proc(proc);
+}
 #else
 struct pcb_t *get_proc(void) {
   struct pcb_t *proc = NULL;
 
   pthread_mutex_lock(&queue_lock);
   /*TODO: get a process from [ready_queue].
-   *       It worth to protect by a mechanism.
+   * It worth to protect by a mechanism.
    *
    */
 
@@ -164,7 +170,7 @@ void put_proc(struct pcb_t *proc) {
   proc->krnl->running_list = &running_list;
 
   /* TODO: put running proc to running_list
-   *       It worth to protect by a mechanism.
+   * It worth to protect by a mechanism.
    *
    */
 
@@ -178,7 +184,7 @@ void add_proc(struct pcb_t *proc) {
   proc->krnl->running_list = &running_list;
 
   /* TODO: put running proc to running_list
-   *       It worth to protect by a mechanism.
+   * It worth to protect by a mechanism.
    *
    */
 
