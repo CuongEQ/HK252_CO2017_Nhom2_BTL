@@ -25,12 +25,17 @@ const char *sys_call_table[] = {
 #include "syscalltbl.lst"
 };
 #undef __SYSCALL
-const int syscall_table_size = sizeof(sys_call_table) / sizeof(char *);
+const int syscall_table_size =
+    sizeof(sys_call_table) / sizeof(sys_call_table[0]);
 
 int __sys_ni_syscall(struct krnl_t *krnl, struct sc_regs *regs) {
   /*
-   * DUMMY systemcall
+   * DUMMY systemcall for unimplemented system calls, it should never be called
+   * in normal execution.
    */
+
+  (void)krnl;
+  (void)regs;
 
   return 0;
 }
@@ -45,4 +50,4 @@ int _syscall(struct krnl_t *krnl, uint32_t pid, uint32_t nr,
   default:
     return __sys_ni_syscall(krnl, regs);
   }
-};
+}
