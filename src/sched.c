@@ -14,6 +14,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
+
 static struct queue_t ready_queue;
 static struct queue_t run_queue;
 static pthread_mutex_t queue_lock;
@@ -35,6 +37,7 @@ int queue_empty(void) {
 }
 
 void init_scheduler(void) {
+
 #ifdef MLQ_SCHED
     int i ;
 
@@ -49,6 +52,7 @@ void init_scheduler(void) {
 	pthread_mutex_init(&queue_lock, NULL);
 }
 
+
 #ifdef MLQ_SCHED
 /* 
  *  Stateful design for routine calling
@@ -56,49 +60,6 @@ void init_scheduler(void) {
  *  We implement stateful here using transition technique
  *  State representation   prio = 0 .. MAX_PRIO, curr_slot = 0..(MAX_PRIO - prio)
  */
-struct pcb_t * get_mlq_proc(void) {
-	struct pcb_t * proc = NULL;
-
-	pthread_mutex_lock(&queue_lock);
-	/*TODO: get a process from PRIORITY [ready_queue].
-	 *      It worth to protect by a mechanism.
-	 * */
-
-	if (proc != NULL)
-		enqueue(&running_list, proc);
-	return proc;	
-}
-
-void put_mlq_proc(struct pcb_t * proc) {
-	proc->krnl->ready_queue = &ready_queue;
-	proc->krnl->mlq_ready_queue = mlq_ready_queue;
-	proc->krnl->running_list = &running_list;
-
-	/* TODO: put running proc to running_list 
-	 *       It worth to protect by a mechanism.
-	 * 
-	 */
-
-	pthread_mutex_lock(&queue_lock);
-	enqueue(&mlq_ready_queue[proc->prio], proc);
-	pthread_mutex_unlock(&queue_lock);
-}
-
-void add_mlq_proc(struct pcb_t * proc) {
-	proc->krnl->ready_queue = &ready_queue;
-	proc->krnl->mlq_ready_queue = mlq_ready_queue;
-	proc->krnl->running_list = &running_list;
-
-	/* TODO: put running proc to running_list
-	 *       It worth to protect by a mechanism.
-	 * 
-	 */
-       
-	pthread_mutex_lock(&queue_lock);
-	enqueue(&mlq_ready_queue[proc->prio], proc);
-	pthread_mutex_unlock(&queue_lock);	
-}
-
 struct pcb_t * get_proc(void) {
 	return get_mlq_proc();
 }
@@ -115,10 +76,16 @@ struct pcb_t * get_proc(void) {
 	struct pcb_t * proc = NULL;
 
 	pthread_mutex_lock(&queue_lock);
-	/*TODO: get a process from [ready_queue].
-	 *       It worth to protect by a mechanism.
-	 * 
-	 */
+	
+	if (empty(&ready_queue) && !empty(&run_queue)) {
+        while (!empty(&run_queue)) {
+            enqueue(&ready_queue, dequeue(&run_queue));
+        }
+    }
+
+    if (!empty(&ready_queue)) {
+        proc = dequeue(&ready_queue);
+    }
 
 	pthread_mutex_unlock(&queue_lock);
 
@@ -126,32 +93,22 @@ struct pcb_t * get_proc(void) {
 }
 
 void put_proc(struct pcb_t * proc) {
+	pthread_mutex_lock(&queue_lock);
+	
 	proc->krnl->ready_queue = &ready_queue;
 	proc->krnl->running_list = &running_list;
-
-	/* TODO: put running proc to running_list 
-	 *       It worth to protect by a mechanism.
-	 * 
-	 */
-
-	pthread_mutex_lock(&queue_lock);
 	enqueue(&run_queue, proc);
+	
 	pthread_mutex_unlock(&queue_lock);
 }
 
 void add_proc(struct pcb_t * proc) {
+	pthread_mutex_lock(&queue_lock);
+	
 	proc->krnl->ready_queue = &ready_queue;
 	proc->krnl->running_list = &running_list;
-
-	/* TODO: put running proc to running_list 
-	 *       It worth to protect by a mechanism.
-	 * 
-	 */
-
-	pthread_mutex_lock(&queue_lock);
-	enqueue(&ready_queue, proc);
-	pthread_mutex_unlock(&queue_lock);	
+	enqueue(&ready_queue, proc); 
+	
+	pthread_mutex_unlock(&queue_lock);
 }
 #endif
-
-
