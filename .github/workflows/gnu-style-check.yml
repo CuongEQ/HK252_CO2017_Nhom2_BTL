@@ -1,13 +1,13 @@
-name: C/C++ CI
+name: GNU Coding Style Check (Syscall branch only)
 
 on:
   push:
-    branches: [ "development" ]
+    branches: [ "feature/syscall" ]
   pull_request:
     branches: [ "development" ]
 
 jobs:
-  build:
+  gnu-style-check:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,20 +32,3 @@ jobs:
         clang-format --style=GNU --dry-run -Werror \
           src/syscall*.c \
           src/sys_*.c
-
-    - name: Kiểm tra tĩnh (Passive) mã nguồn
-      run: |
-        cppcheck --enable=all --error-exitcode=1 --suppress=missingIncludeSystem src/
-    
-    - name: Biên dịch toàn bộ mã nguồn
-      run: |
-        make all
-
-    - name: Thực thi chương trình và Kiểm tra động
-      run: |
-        if [ -f "os" ]; then
-          valgrind --leak-check=full --error-exitcode=1 ./os sched
-        else
-          echo "Lỗi: Không tìm thấy tệp thực thi 'os'."
-          exit 1
-        fi
