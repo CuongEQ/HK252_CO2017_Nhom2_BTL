@@ -91,13 +91,11 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, addr_t size, addr_t *allo
 
   /*Attempt to increate limit to get space */
 #ifdef MM64
-  inc_sz = (uint32_t)(size/(int)PAGING64_PAGESZ);
-  inc_sz = inc_sz + 1;
+  inc_sz = (uint32_t)(size/(int)PAGING64_PAGESZ) + 1;
 #else
   inc_sz = PAGING_PAGE_ALIGNSZ(size);
 #endif
   int old_sbrk;
-  inc_sz = inc_sz + 1;
 
   old_sbrk = cur_vma->sbrk;
 
@@ -202,7 +200,11 @@ int libfree(struct pcb_t *proc, uint32_t reg_index)
   {
     return -1;
   }
-printf("%s:%d\n",__func__,__LINE__);
+
+#ifdef MMDBG
+  printf("%s:%d\n", __func__, __LINE__);
+#endif
+
 #ifdef IODUMP
   /* TODO dump IO content (if needed) */
 #ifdef PAGETBL_DUMP
@@ -221,51 +223,36 @@ printf("%s:%d\n",__func__,__LINE__);
  */
 int pg_getpage(struct mm_struct *mm, int pgn, int *fpn, struct pcb_t *caller)
 {
-
   uint32_t pte = pte_get_entry(caller, pgn);
 
-  if (!PAGING_PAGE_PRESENT(pte))
-  { /* Page is not online, make it actively living */
+  if (!PAGING_PAGE_PRESENT(pte)) {
     addr_t vicpgn, swpfpn;
-//  addr_t vicfpn;
-//  addr_t vicpte;
-//  struct sc_regs regs;
 
-    /* TODO Initialize the target frame storing our variable */
-//  addr_t tgtfpn 
-
-    /* TODO: Play with your paging theory here */
-    /* Find victim page */
+    /* 1. Tìm victim page từ FIFO */
     if (find_victim_page(caller->krnl->mm, &vicpgn) == -1)
-    {
       return -1;
-    }
 
-    /* Get free frame in MEMSWP */
+    /* 2. Lấy FPN của victim */
+    uint32_t vicpte = pte_get_entry(caller, vicpgn);
+    addr_t vicfpn = PAGING_FPN(vicpte);
+
+    /* 3. Lấy frame trống trên SWAP */
     if (MEMPHY_get_freefp(caller->krnl->active_mswp, &swpfpn) == -1)
-    {
       return -1;
-    }
 
-    /* TODO: Implement swap frame from MEMRAM to MEMSWP and vice versa*/
+    /* 4. Copy victim frame → SWAP */
+    __mm_swap_page(caller, vicfpn, swpfpn);
 
-    /* TODO copy victim frame to swap 
-     * SWP(vicfpn <--> swpfpn)
-     * SYSCALL 1 sys_memmap
-     */
+    /* 5. Đánh dấu victim page đã bị swap out */
+    pte_set_swap(caller, vicpgn, 0, swpfpn);
 
-
-    /* Update page table */
-    //pte_set_swap(...);
-
-    /* Update its online status of the target page */
-    //pte_set_fpn(...);
+    /* 6. Đánh dấu trang mục tiêu là present, dùng frame của victim */
+    pte_set_fpn(caller, pgn, vicfpn);
 
     enlist_pgn_node(&caller->krnl->mm->fifo_pgn, pgn);
   }
 
-  *fpn = PAGING_FPN(pte_get_entry(caller,pgn));
-
+  *fpn = PAGING_FPN(pte_get_entry(caller, pgn));
   return 0;
 }
 
@@ -278,19 +265,20 @@ int pg_getpage(struct mm_struct *mm, int pgn, int *fpn, struct pcb_t *caller)
 int pg_getval(struct mm_struct *mm, int addr, BYTE *data, struct pcb_t *caller)
 {
   int pgn = PAGING_PGN(addr);
-//int off = PAGING_OFFST(addr);
+  int off = PAGING_OFFST(addr);   // ← bỏ comment
   int fpn;
 
   if (pg_getpage(mm, pgn, &fpn, caller) != 0)
-    return -1; /* invalid page access */
+    return -1;
 
-//int phyaddr = (fpn << PAGING_ADDR_FPN_LOBIT) + off;
+  int phyaddr = fpn * PAGING_PAGESZ + off;  // ← bỏ comment
 
-  /* TODO 
-   *  MEMPHY_read(caller->krnl->mram, phyaddr, data);
-   *  MEMPHY READ 
-   *  SYSCALL 17 sys_memmap with SYSMEM_IO_READ
-   */
+  /* Dùng syscall MEMIO để đọc vật lý */
+  struct sc_regs regs;
+  regs.a1 = SYSMEM_IO_READ;
+  regs.a2 = phyaddr;
+  regs.a3 = (addr_t)data;
+  _syscall(caller->krnl, caller->pid, 17, &regs);
 
   return 0;
 }
@@ -304,19 +292,19 @@ int pg_getval(struct mm_struct *mm, int addr, BYTE *data, struct pcb_t *caller)
 int pg_setval(struct mm_struct *mm, int addr, BYTE value, struct pcb_t *caller)
 {
   int pgn = PAGING_PGN(addr);
-//int off = PAGING_OFFST(addr);
+  int off = PAGING_OFFST(addr);
   int fpn;
 
-  /* Get the page to MEMRAM, swap from MEMSWAP if needed */
   if (pg_getpage(mm, pgn, &fpn, caller) != 0)
-    return -1; /* invalid page access */
+    return -1;
 
+  int phyaddr = fpn * PAGING_PAGESZ + off;
 
-  /* TODO 
-   *  MEMPHY_write(caller->krnl->mram, phyaddr, value);
-   *  MEMPHY WRITE with SYSMEM_IO_WRITE 
-   * SYSCALL 17 sys_memmap
-   */
+  struct sc_regs regs;
+  regs.a1 = SYSMEM_IO_WRITE;
+  regs.a2 = phyaddr;
+  regs.a3 = (addr_t)value;
+  _syscall(caller->krnl, caller->pid, 17, &regs);
 
   return 0;
 }
@@ -331,12 +319,14 @@ int pg_setval(struct mm_struct *mm, int addr, BYTE value, struct pcb_t *caller)
  */
 int __read(struct pcb_t *caller, int vmaid, int rgid, addr_t offset, BYTE *data)
 {
-  struct vm_rg_struct *currg = get_symrg_byid(caller->krnl->mm, rgid);
+  // struct vm_rg_struct *currg = get_symrg_byid(caller->krnl->mm, rgid);
 
 //struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, vmaid);
 
   /* TODO Invalid memory identify */
-
+  struct vm_rg_struct *currg = get_symrg_byid(caller->krnl->mm, rgid);
+  if (currg == NULL || (currg->rg_start == 0 && currg->rg_end == 0))
+      return -1;
   pg_getval(caller->krnl->mm, currg->rg_start + offset, data, caller);
 
   return 0;
@@ -350,7 +340,11 @@ int libread(
     uint32_t* destination)
 {
   BYTE data;
-printf("%s:%d\n",__func__,__LINE__);
+  
+#ifdef MMDBG
+printf("%s:%d\n", __func__, __LINE__);
+#endif
+
   int val = __read(proc, 0, source, offset, &data);
 
   *destination = data;
@@ -537,7 +531,7 @@ int libkmem_copy_to_user(struct pcb_t *caller, uint32_t source, uint32_t destina
   //__read_kernel_mem(...)
   //__write_user_mem(...);
 
-  return 1;
+  return 0;
 }
 
 
@@ -616,7 +610,8 @@ int free_pcb_memph(struct pcb_t *caller)
 
   for (pagenum = 0; pagenum < PAGING_MAX_PGN; pagenum++)
   {
-    pte = caller->krnl->mm->pgd[pagenum];
+    // pte = caller->krnl->mm->pgd[pagenum];
+    pte = pte_get_entry(caller, pagenum);
 
     if (PAGING_PAGE_PRESENT(pte))
     {
@@ -649,11 +644,17 @@ int find_victim_page(struct mm_struct *mm, addr_t *retpgn)
   {
     return -1;
   }
+  if (pg->pg_next == NULL) {
+      // Chỉ có 1 phần tử
+      *retpgn = pg->pgn;
+      mm->fifo_pgn = NULL;
+      free(pg);
+      return 0;
+  }
   struct pgn_t *prev = NULL;
-  while (pg->pg_next)
-  {
-    prev = pg;
-    pg = pg->pg_next;
+  while (pg->pg_next) {
+      prev = pg;
+      pg = pg->pg_next;
   }
   *retpgn = pg->pgn;
   prev->pg_next = NULL;
