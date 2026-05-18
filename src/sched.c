@@ -18,7 +18,7 @@
 
 static struct queue_t ready_queue;
 static struct queue_t run_queue;
-static pthread_mutex_t queue_lock;
+pthread_mutex_t queue_lock;
 
 static struct queue_t running_list;
 #ifdef MLQ_SCHED
