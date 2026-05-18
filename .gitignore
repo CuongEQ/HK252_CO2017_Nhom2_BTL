@@ -1,4 +1,5 @@
 *.o
 .stfolder/
-input/
-output/
+README.md
+docs.md
+*.pdf

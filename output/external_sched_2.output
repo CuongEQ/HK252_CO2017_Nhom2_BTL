@@ -1,0 +1,57 @@
+Time slot   0
+	Loaded a process at input/proc/s0, PID: 1 
+	CPU 1: Dispatched process  1
+Time slot   1
+	Loaded a process at input/proc/s1, PID: 2 
+Time slot   2
+	CPU 1: Put process  1 to run queue (2/10)
+	CPU 0: Dispatched process  2
+	CPU 1: Dispatched process  1
+Time slot   3
+Time slot   4
+	CPU 1: Put process  1 to run queue (4/10)
+	CPU 1: Dispatched process  1
+	CPU 0: Put process  2 to run queue (2/5)
+	CPU 0: Dispatched process  2
+Time slot   5
+	Loaded a process at input/proc/s0, PID: 3 
+Time slot   6
+	CPU 1: Put process  1 to run queue (6/10)
+	CPU 1: Dispatched process  3
+	CPU 0: Put process  2 to run queue (4/5)
+	CPU 0: Dispatched process  1
+	Loaded a process at input/proc/s1, PID: 4 
+Time slot   7
+Time slot   8
+	CPU 1: Put process  3 to run queue (2/10)
+	CPU 1: Dispatched process  2
+	CPU 0: Put process  1 to run queue (8/10)
+	CPU 0: Dispatched process  4
+Time slot   9
+	CPU 1: Processed  2 has finished (5/5)
+	CPU 1: Dispatched process  3
+Time slot  10
+	CPU 0: Put process  4 to run queue (2/5)
+	CPU 0: Dispatched process  1
+Time slot  11
+	CPU 1: Put process  3 to run queue (4/10)
+	CPU 1: Dispatched process  4
+Time slot  12
+	CPU 0: Processed  1 has finished (10/10)
+	CPU 0: Dispatched process  3
+Time slot  13
+	CPU 1: Put process  4 to run queue (4/5)
+	CPU 1: Dispatched process  4
+Time slot  14
+	CPU 1: Processed  4 has finished (5/5)
+	CPU 1 stopped
+	CPU 0: Put process  3 to run queue (6/10)
+	CPU 0: Dispatched process  3
+Time slot  15
+Time slot  16
+	CPU 0: Put process  3 to run queue (8/10)
+	CPU 0: Dispatched process  3
+Time slot  17
+Time slot  18
+	CPU 0: Processed  3 has finished (10/10)
+	CPU 0 stopped
