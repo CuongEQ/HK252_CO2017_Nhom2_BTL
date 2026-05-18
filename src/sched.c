@@ -36,7 +36,7 @@ int queue_empty(void) {
   }
   return 1; 
 #else
-  return empty(&ready_queue);
+  return (empty(&ready_queue) && empty(&run_queue));
 #endif
 }
 
@@ -101,29 +101,16 @@ struct pcb_t *get_mlq_proc(void) {
 }
 
 void put_mlq_proc(struct pcb_t *proc) {
-  proc->krnl->ready_queue = &ready_queue;
-  proc->krnl->mlq_ready_queue = mlq_ready_queue;
-  proc->krnl->running_list = &running_list;
-
   pthread_mutex_lock(&queue_lock);
-  purgequeue(&running_list, proc);
-
   int safe_prio = (proc->prio >= MAX_PRIO) ? (MAX_PRIO - 1) : proc->prio;
   enqueue(&mlq_ready_queue[safe_prio], proc);
-  
   pthread_mutex_unlock(&queue_lock);
 }
 
 void add_mlq_proc(struct pcb_t *proc) {
-  proc->krnl->ready_queue = &ready_queue;
-  proc->krnl->mlq_ready_queue = mlq_ready_queue;
-  proc->krnl->running_list = &running_list;
-
   pthread_mutex_lock(&queue_lock);
-
   int safe_prio = (proc->prio >= MAX_PRIO) ? (MAX_PRIO - 1) : proc->prio;
   enqueue(&mlq_ready_queue[safe_prio], proc);
-  
   pthread_mutex_unlock(&queue_lock);
 }
 
@@ -179,48 +166,3 @@ void add_proc(struct pcb_t *proc) {
   pthread_mutex_unlock(&queue_lock);
 }
 #endif
-
-/* * Safe PID lookup with queue_lock protection to avoid race conditions
- * when traversing queues while other threads might be mutating them.
- */
-struct pcb_t *get_proc_by_pid(uint32_t pid) {
-  struct pcb_t *proc = NULL;
-  
-  pthread_mutex_lock(&queue_lock);
-
-  for (int i = 0; i < running_list.size; i++) {
-    if (running_list.proc[i]->pid == pid) {
-      proc = running_list.proc[i];
-      goto done;
-    }
-  }
-
-  for (int i = 0; i < ready_queue.size; i++) {
-    if (ready_queue.proc[i]->pid == pid) {
-      proc = ready_queue.proc[i];
-      goto done;
-    }
-  }
-
-#ifdef MLQ_SCHED
-  for (int prio = 0; prio < MAX_PRIO; prio++) {
-    for (int i = 0; i < mlq_ready_queue[prio].size; i++) {
-      if (mlq_ready_queue[prio].proc[i]->pid == pid) {
-        proc = mlq_ready_queue[prio].proc[i];
-        goto done;
-      }
-    }
-  }
-#else
-  for (int i = 0; i < run_queue.size; i++) {
-    if (run_queue.proc[i]->pid == pid) {
-      proc = run_queue.proc[i];
-      goto done;
-    }
-  }
-#endif
-
-done:
-  pthread_mutex_unlock(&queue_lock);
-  return proc;
-}

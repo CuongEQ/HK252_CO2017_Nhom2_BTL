@@ -13,11 +13,8 @@ void enqueue(struct queue_t *q, struct pcb_t *proc) {
   if (q == NULL || proc == NULL)
     return;
 
-  if (q->size >= MAX_QUEUE_SIZE) {
-    fprintf(stderr, "Error: Queue overflow! (size=%d, max=%d)\n",
-            q->size, MAX_QUEUE_SIZE);
+  if (q->size >= MAX_QUEUE_SIZE)
     return;
-  }
 
   q->proc[q->size] = proc;
   q->size++;
@@ -29,10 +26,17 @@ struct pcb_t *dequeue(struct queue_t *q) {
    * */
   if (empty(q))
     return NULL;
+  /* Find the highest priority process (lowest prio)*/
+  int best_idx = 0;
+  for (int i = 1; i < q->size; i++) {
+    if (q->proc[i]->prio < q->proc[best_idx]->prio) {
+      best_idx = i;
+    }
+  }
 
-  struct pcb_t *proc = q->proc[0];
+  struct pcb_t *proc = q->proc[best_idx];
 
-  for (int i = 0; i < q->size - 1; i++) {
+  for (int i = best_idx; i < q->size - 1; i++) {
     q->proc[i] = q->proc[i + 1];
   }
 
