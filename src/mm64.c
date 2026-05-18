@@ -26,7 +26,7 @@
  * init_pte - Initialize PTE entry
  */
 addr_t vm_map_ram(struct pcb_t *caller, addr_t astart, addr_t aend, addr_t mapstart, int incpgnum, struct vm_rg_struct *ret_rg);
-
+int pg_getpage(struct mm_struct *mm, int pgn, int *fpn, struct pcb_t *caller);
 
 
 int init_pte(addr_t *pte,
@@ -413,7 +413,33 @@ addr_t alloc_pages_range(struct pcb_t *caller, int req_pgnum, struct framephy_st
     }
     else
     { // TODO: ERROR CODE of obtaining somes but not enough frames
-      return -1;
+      addr_t victim_pgn;
+      int victim_fpn;
+      
+      if (find_victim_page(caller->krnl->mm, &victim_pgn) != 0||
+               pg_getpage(caller->krnl->mm, victim_pgn, &victim_fpn, caller) != 0
+              ||MEMPHY_get_freefp(caller->krnl->mram, &fpn) != 0)
+      {
+          while (head) {
+              struct framephy_struct *next = head->fp_next;
+              MEMPHY_put_freefp(caller->krnl->mram, head->fpn);
+              free(head);
+              head = next;
+          }
+          return -1;
+      }
+      
+      struct framephy_struct *newfp = malloc(sizeof(*newfp));
+      newfp->fpn = fpn;
+      newfp->fp_next = NULL;
+      
+      if (head == NULL) head = tail = newfp;
+      else {
+          tail->fp_next = newfp;
+          tail = newfp;
+      }
+        
+      // return -1;
     }
   }
   tail->fp_next=*frm_lst;
@@ -637,9 +663,9 @@ int print_pgtbl(struct pcb_t *caller, addr_t start, addr_t end)
 //struct krnl_t *krnl = caller->krnl;
   struct krnl_t *krnl = caller->krnl;
 
-    addr_t pgn_start= PAGING_PGN(start);
-    addr_t pgn_end= PAGING_PGN(end);
-    addr_t pgit;
+    // addr_t pgn_start= PAGING_PGN(start);
+    // addr_t pgn_end= PAGING_PGN(end);
+    // addr_t pgit;
 
   addr_t pgd=0;
   addr_t p4d=0;
@@ -650,71 +676,33 @@ int print_pgtbl(struct pcb_t *caller, addr_t start, addr_t end)
   get_pd_from_address(start, &pgd, &p4d, &pud, &pmd, &pt);
 
   /* TODO traverse the page map and dump the page directory entries */
-  for (pgit = pgn_start;
-         pgit <= pgn_end;
-         pgit++)
-    {
-        get_pd_from_pagenum(
-            pgit,
-            &pgd,
-            &p4d,
-            &pud,
-            &pmd,
-            &pt
-        );
-
-        addr_t *pgd_base =
-            krnl->mm->pgd;
-
-        if (pgd_base == NULL)
-            continue;
-
-        if (pgd_base[pgd] == 0)
-            continue;
-
-        addr_t *p4d_base =
-            (addr_t *) pgd_base[pgd];
-
-        if (p4d_base[p4d] == 0)
-            continue;
-
-        addr_t *pud_base =
-            (addr_t *) p4d_base[p4d];
-
-        if (pud_base[pud] == 0)
-            continue;
-
-        addr_t *pmd_base =
-            (addr_t *) pud_base[pud];
-
-        if (pmd_base[pmd] == 0)
-            continue;
-
-        addr_t *pt_base =
-            (addr_t *) pmd_base[pmd];
-
-        addr_t pte = pt_base[pt];
-
-        printf(
-            "PGN %-5lu | "
-            "PGD %-3lu "
-            "P4D %-3lu "
-            "PUD %-3lu "
-            "PMD %-3lu "
-            "PT %-3lu "
-            "=> PTE 0x%08lx\n",
-
-            pgit,
-            pgd,
-            p4d,
-            pud,
-            pmd,
-            pt,
-            pte
-        );
+  addr_t *pgd_base = krnl->mm->pgd;
+    if (pgd_base == NULL) {
+        printf("print_pgtbl: pgd_base is NULL\n");
+        return -1;
     }
+  
+    printf("print_pgtbl:\n");
+    printf(" PDG=" FORMAT_ADDR, (addr_t)pgd_base);
+    
+    if (pgd_base[pgd] != 0) {
+        addr_t *p4d_base = (addr_t *)pgd_base[pgd];
+        printf(" P4g=" FORMAT_ADDR, (addr_t)p4d_base);
+        
+        if (p4d_base[p4d] != 0) {
+            addr_t *pud_base = (addr_t *)p4d_base[p4d];
+            printf(" PUD=" FORMAT_ADDR, (addr_t)pud_base);
+            
+            if (pud_base[pud] != 0) {
+                addr_t *pmd_base = (addr_t *)pud_base[pud];
+                printf(" PMD=" FORMAT_ADDR, (addr_t)pmd_base);
+            }
+        }
+    }
+    
+    printf("\n");
+    return 0;
 
-  return 0;
 }
 
 #endif  //def MM64
