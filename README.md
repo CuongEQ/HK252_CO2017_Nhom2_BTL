@@ -14,11 +14,6 @@ Ngoài ra còn có một số nhóm tệp khác có chức năng như sau:
 - `Makefile`: Tệp Makefile dùng để biên dịch dự án tự động
 - `docs/*.md`: Đặc tả công việc của từng nhánh
 
-Ngoài ra còn có một số nhóm tệp khác có chức năng như sau:
-- `docs.md`: Đặc tả của BTL này, được viết lại dưới dạng Markdown để dễ sử dụng trong các công cụ AI
-- `Makefile`: Tệp Makefile dùng để biên dịch dự án tự động
-- `docs/*.md`: Đặc tả công việc của từng nhánh
-
 ### Cấu trúc của các nhánh (Branch)
 Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với nhiều mục đích/nhiệm vụ khác nhau bao gồm:
 - `master`: Nhánh chính, là sản phẩm cuối cùng đã được kiểm tra, dùng để nộp cho giảng viên.

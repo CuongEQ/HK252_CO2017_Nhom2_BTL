@@ -12,12 +12,15 @@
 #include "os-mm.h"
 #include "queue.h"
 #include "syscall.h"
+#include <pthread.h>
 
 #ifdef MM64
 #include "mm64.h"
 #else
 #include "mm.h"
 #endif
+
+extern pthread_mutex_t queue_lock;
 
 // Find the process in the given queue by PID
 static struct pcb_t *
@@ -46,15 +49,17 @@ find_proc_by_pid (struct krnl_t *krnl, uint32_t pid)
   if (krnl == NULL)
     return NULL;
 
+  pthread_mutex_lock (&queue_lock);
+
   proc = find_proc_in_queue (krnl->running_list,
                              pid); // Check in running_list first
   if (proc != NULL)
-    return proc;
+    goto done;
 
   proc = find_proc_in_queue (krnl->ready_queue,
                              pid); // Check in ready_queue next
   if (proc != NULL)
-    return proc;
+    goto done;
 
 #ifdef MLQ_SCHED // If MLQ_SCHED is supported, check in mlq_ready_queue last
   if (krnl->mlq_ready_queue != NULL)
@@ -63,12 +68,14 @@ find_proc_by_pid (struct krnl_t *krnl, uint32_t pid)
         {
           proc = find_proc_in_queue (&krnl->mlq_ready_queue[prio], pid);
           if (proc != NULL)
-            return proc;
+            goto done;
         }
     }
 #endif
 
-  return NULL;
+done:
+  pthread_mutex_unlock (&queue_lock);
+  return proc;
 }
 
 int
