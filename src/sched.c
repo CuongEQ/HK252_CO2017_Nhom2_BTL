@@ -30,14 +30,12 @@ int queue_empty(void) {
   unsigned long prio;
   for (prio = 0; prio < MAX_PRIO; prio++) {
     if (!empty(&mlq_ready_queue[prio])) {
-      return 0; // FIX: Trả về 0 (False - Không rỗng) thay vì -1
-    }
+      return 0;
   }
-  return 1; // FIX: Nếu quét hết MLQ mà trống, trả về 1 (True - Đã rỗng) 
-            // (Đã loại bỏ hoàn toàn run_queue theo đặc tả)
+  return 1;
+
 #else
-  return empty(&ready_queue); // Fallback: Cũng bỏ run_queue cho an toàn
-#endif
+  return empty(&ready_queue);
 }
 
 void init_scheduler(void) {
