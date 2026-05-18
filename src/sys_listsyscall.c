@@ -10,8 +10,7 @@
 
 #include "syscall.h"
 
-int
-__sys_listsyscall (struct krnl_t *krnl, uint32_t pid, struct sc_regs *reg)
+int __sys_listsyscall (struct krnl_t *krnl, uint32_t pid, struct sc_regs *reg)
 {
   (void)krnl;
   (void)pid;
