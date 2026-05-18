@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <pthread.h>
 
+addr_t vm_map_ram(struct pcb_t *caller, addr_t astart, addr_t aend, addr_t mapstart, int incpgnum, struct vm_rg_struct *ret_rg);
+
 /*get_vma_by_num - get vm area by numID
  *@mm: memory region
  *@vmaid: ID vm area to alloc memory region
@@ -76,7 +78,10 @@ struct vm_rg_struct *get_vm_area_node_at_brk(struct pcb_t *caller, int vmaid, ad
 
   newrg = malloc(sizeof(struct vm_rg_struct));
   newrg->rg_start = cur_vma->sbrk;
-  newrg->rg_end = newrg->rg_start + size;
+  newrg->rg_end = newrg->rg_start + alignedsz;
+  cur_vma->sbrk=newrg->rg_end;
+  cur_vma->vm_end = newrg->rg_end;
+  newrg->rg_next=NULL;
   /* END TODO */
 
   return newrg;
@@ -115,7 +120,8 @@ int validate_overlap_vm_area(struct pcb_t *caller, int vmaid, addr_t vmastart, a
 
   while (vma != NULL)
   {
-    if (vma != cur_area && OVERLAP(cur_area->vm_start, cur_area->vm_end, vma->vm_start, vma->vm_end))
+    // if (vma != cur_area && OVERLAP(vmastart,vmaend, vma->vm_start, vma->vm_end))
+    if (vma != cur_area &&OVERLAP(vmastart,vmaend, vma->vm_start, vma->vm_end))
     {
       return -1;
     }
@@ -139,23 +145,31 @@ int inc_vma_limit(struct pcb_t *caller, int vmaid, addr_t inc_sz)
   /* TOTO with new address scheme, the size need tobe aligned 
    *      the raw inc_sz maybe not fit pagesize
    */ 
-  //addr_t inc_amt;
+  addr_t inc_amt=PAGING_PAGE_ALIGNSZ(inc_sz);
 
-//  int incnumpage =  inc_amt / PAGING_PAGESZ;
+ int incnumpage =  inc_amt / PAGING_PAGESZ;
 
   /* TODO Validate overlap of obtained region */
-  //if (validate_overlap_vm_area(caller, vmaid, area->rg_start, area->rg_end) < 0)
-  //  return -1; /*Overlap and failed allocation */
+  struct vm_area_struct *area = get_vma_by_num(caller->krnl->mm, vmaid);
+  if(!area){
+    return -1;
+  }
+  addr_t old_end=area->vm_end;
+  addr_t new_end=area->vm_end+inc_amt;
+  if (validate_overlap_vm_area(caller, vmaid, old_end, new_end) < 0)
+   return -1; /*Overlap and failed allocation */
 
   /* TODO: Obtain the new vm area based on vmaid */
   //cur_vma->vm_end... 
+  area->vm_end=new_end;
   // inc_limit_ret...
   /* The obtained vm area (only)
    * now will be alloc real ram region */
+  struct vm_rg_struct *newrg = malloc(sizeof(struct vm_rg_struct));
 
-//  if (vm_map_ram(caller, area->rg_start, area->rg_end, 
-//                   old_end, incnumpage , newrg) < 0)
-//    return -1; /* Map the memory to MEMRAM */
+ if (vm_map_ram(caller, old_end, new_end, 
+                  old_end, incnumpage , newrg) < 0)
+   return -1; /* Map the memory to MEMRAM */
 
   return 0;
 }

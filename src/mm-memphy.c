@@ -50,7 +50,7 @@ int MEMPHY_seq_read(struct memphy_struct *mp, addr_t addr, BYTE *value)
    if (mp == NULL)
       return -1;
 
-   if (!mp->rdmflg)
+   if (mp->rdmflg)
       return -1; /* Not compatible mode for sequential read */
 
    MEMPHY_mv_csr(mp, addr);
@@ -67,12 +67,15 @@ int MEMPHY_seq_read(struct memphy_struct *mp, addr_t addr, BYTE *value)
  */
 int MEMPHY_read(struct memphy_struct *mp, addr_t addr, BYTE *value)
 {
-   if (mp == NULL)
+   if (mp == NULL || value == NULL)
+      return -1;
+
+   if (addr >= (addr_t)mp->maxsz)
       return -1;
 
    if (mp->rdmflg)
       *value = mp->storage[addr];
-   else /* Sequential access device */
+   else
       return MEMPHY_seq_read(mp, addr, value);
 
    return 0;
@@ -90,7 +93,7 @@ int MEMPHY_seq_write(struct memphy_struct *mp, addr_t addr, BYTE value)
    if (mp == NULL)
       return -1;
 
-   if (!mp->rdmflg)
+   if (mp->rdmflg)
       return -1; /* Not compatible mode for sequential read */
 
    MEMPHY_mv_csr(mp, addr);
@@ -110,14 +113,16 @@ int MEMPHY_write(struct memphy_struct *mp, addr_t addr, BYTE data)
    if (mp == NULL)
       return -1;
 
+   if (addr >= (addr_t)mp->maxsz)
+      return -1;
+
    if (mp->rdmflg)
       mp->storage[addr] = data;
-   else /* Sequential access device */
+   else
       return MEMPHY_seq_write(mp, addr, data);
 
    return 0;
 }
-
 /*
  *  MEMPHY_format-format MEMPHY device
  *  @mp: memphy struct
@@ -135,6 +140,7 @@ int MEMPHY_format(struct memphy_struct *mp, int pagesz)
    /* Init head of free framephy list */
    fst = malloc(sizeof(struct framephy_struct));
    fst->fpn = iter;
+   fst->fp_next = NULL;
    mp->free_fp_list = fst;
 
    /* We have list with first element, fill in the rest num-1 element member*/
@@ -170,9 +176,12 @@ int MEMPHY_get_freefp(struct memphy_struct *mp, addr_t *retfpn)
 
 int MEMPHY_dump(struct memphy_struct *mp)
 {
-  /*TODO dump memphy contnt mp->storage
-   *     for tracing the memory content
-   */
+   if (mp == NULL) return -1;
+   printf("=== MEMPHY DUMP (maxsz=%d) ===\n", mp->maxsz);
+   for (int i = 0; i < mp->maxsz; i++)
+      if (mp->storage[i] != 0)
+         printf("[%04d]: 0x%02x\n", i, (unsigned char)mp->storage[i]);
+   printf("==============================\n");
    return 0;
 }
 
@@ -198,11 +207,15 @@ int init_memphy(struct memphy_struct *mp, addr_t max_size, int randomflg)
    mp->maxsz = max_size;
    memset(mp->storage, 0, max_size * sizeof(BYTE));
 
+#ifdef MM64
+   MEMPHY_format(mp, 4096);      // PAGING64_PAGESZ = 4096 (4KB)
+#else
    MEMPHY_format(mp, PAGING_PAGESZ);
+#endif
 
    mp->rdmflg = (randomflg != 0) ? 1 : 0;
 
-   if (!mp->rdmflg) /* Not Ramdom acess device, then it serial device*/
+   if (!mp->rdmflg)
       mp->cursor = 0;
 
    return 0;
