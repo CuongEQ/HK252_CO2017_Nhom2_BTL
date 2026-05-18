@@ -26,7 +26,7 @@
  */
 int MEMPHY_mv_csr(struct memphy_struct *mp, addr_t offset)
 {
-   int numstep = 0;
+   addr_t numstep = 0;
 
    mp->cursor = 0;
    while (numstep < offset && numstep < mp->maxsz)
@@ -177,10 +177,10 @@ int MEMPHY_get_freefp(struct memphy_struct *mp, addr_t *retfpn)
 int MEMPHY_dump(struct memphy_struct *mp)
 {
    if (mp == NULL) return -1;
-   printf("=== MEMPHY DUMP (maxsz=%d) ===\n", mp->maxsz);
-   for (int i = 0; i < mp->maxsz; i++)
+   printf("=== MEMPHY DUMP (maxsz=%llu) ===\n", (unsigned long long)mp->maxsz);
+   for (addr_t i = 0; i < mp->maxsz; i++)
       if (mp->storage[i] != 0)
-         printf("[%04d]: 0x%02x\n", i, (unsigned char)mp->storage[i]);
+         printf("[%04llu]: 0x%02x\n", (unsigned long long)i, (unsigned char)mp->storage[i]);
    printf("==============================\n");
    return 0;
 }
@@ -208,7 +208,8 @@ int init_memphy(struct memphy_struct *mp, addr_t max_size, int randomflg)
    memset(mp->storage, 0, max_size * sizeof(BYTE));
 
 #ifdef MM64
-   MEMPHY_format(mp, 4096);      // PAGING64_PAGESZ = 4096 (4KB)
+#define MM64_PAGESZ 4096   /* equivalent to PAGING64_PAGESZ */
+   MEMPHY_format(mp, MM64_PAGESZ);
 #else
    MEMPHY_format(mp, PAGING_PAGESZ);
 #endif
