@@ -30,12 +30,13 @@ int queue_empty(void) {
   unsigned long prio;
   for (prio = 0; prio < MAX_PRIO; prio++) {
     if (!empty(&mlq_ready_queue[prio])) {
-      return 0;
+      return 0; 
+    }
   }
-  return 1;
-
+  return 1; 
 #else
   return empty(&ready_queue);
+#endif
 }
 
 void init_scheduler(void) {
@@ -207,6 +208,13 @@ struct pcb_t *get_proc_by_pid(uint32_t pid) {
         proc = mlq_ready_queue[prio].proc[i];
         goto done;
       }
+    }
+  }
+#else
+  for (int i = 0; i < run_queue.size; i++) {
+    if (run_queue.proc[i]->pid == pid) {
+      proc = run_queue.proc[i];
+      goto done;
     }
   }
 #endif

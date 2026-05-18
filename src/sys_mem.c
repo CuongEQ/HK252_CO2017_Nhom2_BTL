@@ -20,7 +20,7 @@
 #include "mm.h"
 #endif
 
-extern pthread_mutex_t queue_lock;
+//extern pthread_mutex_t queue_lock;
 
 // Find the process in the given queue by PID
 static struct pcb_t *
