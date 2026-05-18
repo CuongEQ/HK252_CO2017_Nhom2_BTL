@@ -8,8 +8,8 @@
  * for the sole purpose of studying while attending the course CO2018.
  */
 
-#include "sched.h"
 #include "queue.h"
+#include "sched.h"
 #include <pthread.h>
 
 #include <stdio.h>
@@ -17,7 +17,8 @@
 
 static struct queue_t ready_queue;
 static struct queue_t run_queue;
-static pthread_mutex_t queue_lock;
+// static pthread_mutex_t queue_lock;
+pthread_mutex_t queue_lock;
 
 static struct queue_t running_list;
 #ifdef MLQ_SCHED
