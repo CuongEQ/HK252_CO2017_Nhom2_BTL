@@ -48,7 +48,7 @@ Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với
 
 ### Sau khi đã có nhánh cục bộ (Local)
 **⚠️ Cảnh báo:** Với mỗi lần làm việc cần đồng bộ mã nguồn mới và hợp nhất (Merge). Không chịu trách nhiệm cho trường hợp hợp nhất lỗi do mã nguồn đã quá lỗi thời. 
-- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout feature/[name] && git merge development`
+- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git fetch origin && git checkout feature/[name] && git merge origin/development`
 - Hiện thực theo yêu cầu và tự kiểm thử.
 - Chuyển toàn bộ nhánh cục bộ (Local) vào hàng chờ git: `git add.`
 - Commit toàn bộ thay đổi với lời nhắn: `git commit -m "[Lời nhắn ở đây]"`
