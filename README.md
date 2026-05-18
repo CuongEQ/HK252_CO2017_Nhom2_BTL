@@ -39,8 +39,8 @@ Repo này được phân chia thành nhiều nhánh (Branch) tương ứng với
 ### Khởi tạo nhánh lần đầu tiên
 - Cấu hình git ưu tiên Merge thay vì Rebase: `git config --global pull.rebase false`
 - Cấu hình git remote (GitHub): `git remote add origin https://github.com/CuongEQ/HK252_CO2017_Nhom2_BTL.git`
-- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git checkout -b develop && git pull origin development`
-- Tạo nhánh làm việc cá nhân: `git checkout -b feature/[name]`
+- Đồng bộ mã nguồn mới nhất từ nhánh `development`: `git fetch origin && git checkout --track -b develop origin/development`
+- Tạo nhánh làm việc cá nhân: `git checkout -b feature/[name] origin/development`
 - Hiện thực theo yêu cầu và tự kiểm thử.
 - Chuyển toàn bộ nhánh cục bộ (Local) vào hàng chờ git: `git add.`
 - Commit toàn bộ thay đổi với lời nhắn: `git commit -m "[Lời nhắn ở đây]"`
