@@ -17,7 +17,7 @@
 
 static struct queue_t ready_queue;
 static struct queue_t run_queue;
-pthread_mutex_t queue_lock;
+static pthread_mutex_t queue_lock;
 
 static struct queue_t running_list;
 #ifdef MLQ_SCHED
@@ -28,11 +28,16 @@ static int slot[MAX_PRIO];
 int queue_empty(void) {
 #ifdef MLQ_SCHED
   unsigned long prio;
-  for (prio = 0; prio < MAX_PRIO; prio++)
-    if (!empty(&mlq_ready_queue[prio]))
-      return -1;
+  for (prio = 0; prio < MAX_PRIO; prio++) {
+    if (!empty(&mlq_ready_queue[prio])) {
+      return 0; // FIX: Trả về 0 (False - Không rỗng) thay vì -1
+    }
+  }
+  return 1; // FIX: Nếu quét hết MLQ mà trống, trả về 1 (True - Đã rỗng) 
+            // (Đã loại bỏ hoàn toàn run_queue theo đặc tả)
+#else
+  return empty(&ready_queue); // Fallback: Cũng bỏ run_queue cho an toàn
 #endif
-  return (empty(&ready_queue) && empty(&run_queue));
 }
 
 void init_scheduler(void) {
@@ -64,9 +69,6 @@ struct pcb_t *get_mlq_proc(void) {
   pthread_mutex_lock(&queue_lock);
 
   int found = 0;
-  /*TODO: get a process from PRIORITY [ready_queue].
-   * It worth to protect by a mechanism.
-   * */
 
   for (int i = 0; i < MAX_PRIO; i++) {
     if (!empty(&mlq_ready_queue[i]) && slot[i] > 0) {
@@ -103,14 +105,12 @@ void put_mlq_proc(struct pcb_t *proc) {
   proc->krnl->mlq_ready_queue = mlq_ready_queue;
   proc->krnl->running_list = &running_list;
 
-  /* TODO: put running proc to running_list
-   * It worth to protect by a mechanism.
-   *
-   */
-
   pthread_mutex_lock(&queue_lock);
   purgequeue(&running_list, proc);
-  enqueue(&mlq_ready_queue[proc->prio], proc);
+
+  int safe_prio = (proc->prio >= MAX_PRIO) ? (MAX_PRIO - 1) : proc->prio;
+  enqueue(&mlq_ready_queue[safe_prio], proc);
+  
   pthread_mutex_unlock(&queue_lock);
 }
 
@@ -119,13 +119,11 @@ void add_mlq_proc(struct pcb_t *proc) {
   proc->krnl->mlq_ready_queue = mlq_ready_queue;
   proc->krnl->running_list = &running_list;
 
-  /* TODO: put running proc to running_list
-   * It worth to protect by a mechanism.
-   *
-   */
-
   pthread_mutex_lock(&queue_lock);
-  enqueue(&mlq_ready_queue[proc->prio], proc);
+
+  int safe_prio = (proc->prio >= MAX_PRIO) ? (MAX_PRIO - 1) : proc->prio;
+  enqueue(&mlq_ready_queue[safe_prio], proc);
+  
   pthread_mutex_unlock(&queue_lock);
 }
 
@@ -140,15 +138,13 @@ void put_proc(struct pcb_t *proc) {
 void add_proc(struct pcb_t *proc) {
   add_mlq_proc(proc);
 }
+
 #else
+
 struct pcb_t *get_proc(void) {
   struct pcb_t *proc = NULL;
 
   pthread_mutex_lock(&queue_lock);
-  /*TODO: get a process from [ready_queue].
-   * It worth to protect by a mechanism.
-   *
-   */
 
   if (empty(&ready_queue) && !empty(&run_queue)) {
     while (!empty(&run_queue)) {
@@ -169,11 +165,6 @@ void put_proc(struct pcb_t *proc) {
   proc->krnl->ready_queue = &ready_queue;
   proc->krnl->running_list = &running_list;
 
-  /* TODO: put running proc to running_list
-   * It worth to protect by a mechanism.
-   *
-   */
-
   pthread_mutex_lock(&queue_lock);
   enqueue(&run_queue, proc);
   pthread_mutex_unlock(&queue_lock);
@@ -183,13 +174,46 @@ void add_proc(struct pcb_t *proc) {
   proc->krnl->ready_queue = &ready_queue;
   proc->krnl->running_list = &running_list;
 
-  /* TODO: put running proc to running_list
-   * It worth to protect by a mechanism.
-   *
-   */
-
   pthread_mutex_lock(&queue_lock);
   enqueue(&ready_queue, proc);
   pthread_mutex_unlock(&queue_lock);
 }
 #endif
+
+/* * Safe PID lookup with queue_lock protection to avoid race conditions
+ * when traversing queues while other threads might be mutating them.
+ */
+struct pcb_t *get_proc_by_pid(uint32_t pid) {
+  struct pcb_t *proc = NULL;
+  
+  pthread_mutex_lock(&queue_lock);
+
+  for (int i = 0; i < running_list.size; i++) {
+    if (running_list.proc[i]->pid == pid) {
+      proc = running_list.proc[i];
+      goto done;
+    }
+  }
+
+  for (int i = 0; i < ready_queue.size; i++) {
+    if (ready_queue.proc[i]->pid == pid) {
+      proc = ready_queue.proc[i];
+      goto done;
+    }
+  }
+
+#ifdef MLQ_SCHED
+  for (int prio = 0; prio < MAX_PRIO; prio++) {
+    for (int i = 0; i < mlq_ready_queue[prio].size; i++) {
+      if (mlq_ready_queue[prio].proc[i]->pid == pid) {
+        proc = mlq_ready_queue[prio].proc[i];
+        goto done;
+      }
+    }
+  }
+#endif
+
+done:
+  pthread_mutex_unlock(&queue_lock);
+  return proc;
+}

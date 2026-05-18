@@ -13,8 +13,11 @@ void enqueue(struct queue_t *q, struct pcb_t *proc) {
   if (q == NULL || proc == NULL)
     return;
 
-  if (q->size >= MAX_QUEUE_SIZE)
-    return;
+  if (q->size >= MAX_QUEUE_SIZE) {
+    fprintf(stderr, "Error: Queue overflow! (size=%d, max=%d)\n",
+            q->size, MAX_QUEUE_SIZE);
+    abort();
+  }
 
   q->proc[q->size] = proc;
   q->size++;
