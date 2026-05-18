@@ -71,7 +71,6 @@ struct vm_rg_struct *get_symrg_byid(struct mm_struct *mm, int rgid)
 int __alloc(struct pcb_t *caller, int vmaid, int rgid, addr_t size, addr_t *alloc_addr)
 {
   /*Allocate at the toproof */
-  pthread_mutex_lock(&mmvm_lock);
   struct vm_rg_struct rgnode;
   struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, vmaid);
   int inc_sz=0;
@@ -83,7 +82,6 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, addr_t size, addr_t *allo
  
     *alloc_addr = rgnode.rg_start;
 
-    pthread_mutex_unlock(&mmvm_lock);
     return 0;
   }
 
@@ -118,7 +116,6 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, addr_t size, addr_t *allo
 
   *alloc_addr = old_sbrk;
 
-  pthread_mutex_unlock(&mmvm_lock);
   return 0;
 
 }
@@ -132,8 +129,7 @@ int __alloc(struct pcb_t *caller, int vmaid, int rgid, addr_t size, addr_t *allo
  */
 int __free(struct pcb_t *caller, int vmaid, int rgid)
 {
-  pthread_mutex_lock(&mmvm_lock);
-
+  
   if (rgid < 0 || rgid > PAGING_MAX_SYMTBL_SZ)
   {
     pthread_mutex_unlock(&mmvm_lock);
@@ -145,7 +141,6 @@ int __free(struct pcb_t *caller, int vmaid, int rgid)
 
   if (rgnode->rg_start == 0 && rgnode->rg_end == 0)
   {
-    pthread_mutex_unlock(&mmvm_lock);
     return -1;
   }
   struct vm_rg_struct *freerg_node = malloc(sizeof(struct vm_rg_struct));
@@ -159,7 +154,6 @@ int __free(struct pcb_t *caller, int vmaid, int rgid)
   /*enlist the obsoleted memory region */
   enlist_vm_freerg_list(caller->krnl->mm, freerg_node);
 
-  pthread_mutex_unlock(&mmvm_lock);
   return 0;
 }
 
@@ -379,20 +373,17 @@ printf("%s:%d\n", __func__, __LINE__);
  */
 int __write(struct pcb_t *caller, int vmaid, int rgid, addr_t offset, BYTE value)
 {
-  pthread_mutex_lock(&mmvm_lock);
   struct vm_rg_struct *currg = get_symrg_byid(caller->krnl->mm, rgid);
 
   struct vm_area_struct *cur_vma = get_vma_by_num(caller->krnl->mm, vmaid);
 
   if (currg == NULL || cur_vma == NULL) /* Invalid memory identify */
   {
-    pthread_mutex_unlock(&mmvm_lock);
     return -1;
   }
 
   pg_setval(caller->krnl->mm, currg->rg_start + offset, value, caller);
 
-  pthread_mutex_unlock(&mmvm_lock);
   return 0;
 }
 
@@ -620,7 +611,6 @@ int __write_user_mem(struct pcb_t *caller, int vmaid, int rgid, addr_t offset, B
  */
 int free_pcb_memph(struct pcb_t *caller)
 {
-  pthread_mutex_lock(&mmvm_lock);
   int pagenum, fpn;
   uint32_t pte;
 
@@ -641,7 +631,6 @@ int free_pcb_memph(struct pcb_t *caller)
     }
   }
 
-  pthread_mutex_unlock(&mmvm_lock);
   return 0;
 }
 
