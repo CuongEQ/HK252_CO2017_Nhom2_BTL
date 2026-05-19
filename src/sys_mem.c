@@ -8,10 +8,10 @@
  * for the sole purpose of studying while attending the course CO2018.
  */
 
-#include "libmem.h"
 #include "os-mm.h"
-#include "queue.h"
 #include "syscall.h"
+#include "libmem.h"
+#include "queue.h"
 #include <stdlib.h>
 
 #ifdef MM64
@@ -19,8 +19,6 @@
 #else
 #include "mm.h"
 #endif
-
-extern pthread_mutex_t queue_lock;
 
 // Find the process in the given queue by PID
 static struct pcb_t *
@@ -49,8 +47,6 @@ find_proc_by_pid (struct krnl_t *krnl, uint32_t pid)
   if (krnl == NULL)
     return NULL;
 
-  pthread_mutex_lock (&queue_lock);
-
   proc = find_proc_in_queue (krnl->running_list,
                              pid); // Check in running_list first
   if (proc != NULL)
@@ -74,7 +70,6 @@ find_proc_by_pid (struct krnl_t *krnl, uint32_t pid)
 #endif
 
 done:
-  pthread_mutex_unlock (&queue_lock);
   return proc;
 }
 
