@@ -10,6 +10,9 @@ jobs:
   build_and_test:
     runs-on: ubuntu-latest
 
+    env:
+      TESTCASE_TIMEOUT: 30  # Per-testcase timeout in seconds
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -19,15 +22,21 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc make python3
+        sudo apt-get install -y gcc make python3 coreutils
+
+    - name: Show Test Config
+      run: |
+        echo "─── test_config.conf ───"
+        cat test_config.conf || echo "No config file found, will run all tests."
 
     - name: Build project
       run: make all
 
-    - name: Run Tests
+    - name: Run Tests (with per-testcase timeout & module filter)
       run: |
         chmod +x run.sh
         ./run.sh
 
     - name: Smart Diff Output
+      if: always()
       run: python3 smart_diff.py
