@@ -31,7 +31,7 @@ int queue_empty(void) {
 #ifdef MLQ_SCHED
   for (unsigned long prio = 0; prio < MAX_PRIO; prio++) {
     if (!empty(&mlq_ready_queue[prio])) {
-      is_empty = 0; // FIX: Trả về 0 (không rỗng) thay vì -1
+      is_empty = 0;
       break;
     }
   }
