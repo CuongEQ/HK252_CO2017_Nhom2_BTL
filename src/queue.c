@@ -13,11 +13,13 @@ void enqueue(struct queue_t *q, struct pcb_t *proc) {
   if (q == NULL || proc == NULL)
     return;
 
-  if (q->size >= MAX_QUEUE_SIZE)
+  if (q->size >= MAX_QUEUE_SIZE) {
     return;
+  }
 
   q->proc[q->size] = proc;
   q->size++;
+
 }
 
 struct pcb_t *dequeue(struct queue_t *q) {
@@ -27,6 +29,7 @@ struct pcb_t *dequeue(struct queue_t *q) {
   if (empty(q))
     return NULL;
 
+
   struct pcb_t *proc = q->proc[0];
 
   for (int i = 0; i < q->size - 1; i++) {
@@ -35,6 +38,7 @@ struct pcb_t *dequeue(struct queue_t *q) {
 
   q->proc[q->size - 1] = NULL;
   q->size--;
+
 
   return proc;
 }
