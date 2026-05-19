@@ -15,6 +15,9 @@
  */
 
 #include "mm.h"
+#ifdef MM64
+#include "mm64.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,6 +73,11 @@ int MEMPHY_read(struct memphy_struct *mp, addr_t addr, BYTE *value)
    if (mp == NULL)
       return -1;
 
+   if (addr >= mp->maxsz) {
+      *value = 0;
+      return -1;
+   }
+
    if (mp->rdmflg)
       *value = mp->storage[addr];
    else /* Sequential access device */
@@ -108,6 +116,9 @@ int MEMPHY_seq_write(struct memphy_struct *mp, addr_t addr, BYTE value)
 int MEMPHY_write(struct memphy_struct *mp, addr_t addr, BYTE data)
 {
    if (mp == NULL)
+      return -1;
+
+   if (addr >= mp->maxsz)
       return -1;
 
    if (mp->rdmflg)

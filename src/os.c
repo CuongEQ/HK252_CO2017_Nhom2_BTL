@@ -137,7 +137,10 @@ static void * ld_routine(void * args) {
 	printf("ld_routine\n");
 	while (i < num_processes) {
 		struct pcb_t * proc = load(ld_processes.path[i]);
-		struct krnl_t * krnl = proc->krnl = &os;	
+		/* Each process gets its own krnl_t copy so mm is per-process */
+		struct krnl_t * krnl = malloc(sizeof(struct krnl_t));
+		memcpy(krnl, &os, sizeof(struct krnl_t));
+		proc->krnl = krnl;
 
 #ifdef MLQ_SCHED
 		proc->prio = ld_processes.prio[i];

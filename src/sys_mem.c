@@ -8,10 +8,10 @@
  * for the sole purpose of studying while attending the course CO2018.
  */
 
-#include "libmem.h"
 #include "os-mm.h"
-#include "queue.h"
 #include "syscall.h"
+#include "libmem.h"
+#include "queue.h"
 #include <stdlib.h>
 
 #ifdef MM64
@@ -20,113 +20,56 @@
 #include "mm.h"
 #endif
 
-// Find the process in the given queue by PID
-static struct pcb_t *
-find_proc_in_queue (struct queue_t *q, uint32_t pid)
+int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
 {
-  // Input validation
-  if (q == NULL)
-    return NULL;
+   int memop = regs->a1;
+   BYTE value;
+   
+   /* Find the actual process PCB from the running_list using PID */
+   struct pcb_t *caller = NULL;
+   struct queue_t *running_list = krnl->running_list;
+   
+   if (running_list != NULL) {
+     int i;
+     for (i = 0; i < running_list->size; i++) {
+       if (running_list->proc[i] != NULL && running_list->proc[i]->pid == pid) {
+         caller = running_list->proc[i];
+         break;
+       }
+     }
+   }
 
-  for (int i = 0; i < q->size; i++)
-    {
-      if (q->proc[i] != NULL && q->proc[i]->pid == pid)
-        return q->proc[i];
-    }
-
-  return NULL;
+   /* Fallback: create a temporary PCB that references kernel structures */
+   if (caller == NULL) {
+     caller = malloc(sizeof(struct pcb_t));
+     caller->pid = pid;
+     caller->krnl = krnl;
+   }
+   
+   switch (memop) {
+   case SYSMEM_MAP_OP:
+            /* Reserved process case*/
+            vmap_pgd_memset(caller, regs->a2, regs->a3);
+            break;
+   case SYSMEM_INC_OP:
+            inc_vma_limit(caller, regs->a2, regs->a3);
+            break;
+   case SYSMEM_SWP_OP:
+            __mm_swap_page(caller, regs->a2, regs->a3);
+            break;
+   case SYSMEM_IO_READ:
+            MEMPHY_read(caller->krnl->mram, regs->a2, &value);
+            regs->a3 = value;
+            break;
+   case SYSMEM_IO_WRITE:
+            MEMPHY_write(caller->krnl->mram, regs->a2, regs->a3);
+            break;
+   default:
+            printf("Memop code: %d\n", memop);
+            break;
+   }
+   
+   return 0;
 }
 
-// Find the process by PID in `running_list`, `ready_queue` and
-// `mlq_ready_queue` (if supported)
-static struct pcb_t *
-find_proc_by_pid (struct krnl_t *krnl, uint32_t pid)
-{
-  struct pcb_t *proc = NULL;
 
-  if (krnl == NULL)
-    return NULL;
-
-  proc = find_proc_in_queue (krnl->running_list,
-                             pid); // Check in running_list first
-  if (proc != NULL)
-    goto done;
-
-  proc = find_proc_in_queue (krnl->ready_queue,
-                             pid); // Check in ready_queue next
-  if (proc != NULL)
-    goto done;
-
-#ifdef MLQ_SCHED // If MLQ_SCHED is supported, check in mlq_ready_queue last
-  if (krnl->mlq_ready_queue != NULL)
-    {
-      for (int prio = 0; prio < MAX_PRIO; prio++)
-        {
-          proc = find_proc_in_queue (&krnl->mlq_ready_queue[prio], pid);
-          if (proc != NULL)
-            goto done;
-        }
-    }
-#endif
-
-done:
-  return proc;
-}
-
-int
-__sys_memmap (struct krnl_t *krnl, uint32_t pid, struct sc_regs *regs)
-{
-  BYTE value; // Temporary variable to hold the value read from memory for
-              // SYSMEM_IO_READ
-
-  // Input validation
-  if (krnl == NULL || regs == NULL)
-    return -1;
-
-  int memop = (int)regs->a1; // Memory operation code
-  struct pcb_t *caller
-      = find_proc_by_pid (krnl, pid); // Find the caller process by PID
-
-  /*
-   * @bksysnet: Please note in the dual spacing design
-   *            syscall implementations are in kernel space.
-   */
-
-  switch (memop)
-    {
-    case SYSMEM_MAP_OP:
-      /* Reserved process case */
-      if (caller == NULL)
-        return -1;
-      vmap_pgd_memset (caller, (addr_t)regs->a2, (int)regs->a3);
-      break;
-    case SYSMEM_INC_OP:
-      if (caller == NULL)
-        return -1;
-      inc_vma_limit (caller, (int)regs->a2, (addr_t)regs->a3);
-      break;
-    case SYSMEM_SWP_OP:
-      if (caller == NULL)
-        return -1;
-      __mm_swap_page (caller, (addr_t)regs->a2, (addr_t)regs->a3);
-      break;
-    case SYSMEM_IO_READ:
-      if (krnl->mram == NULL)
-        return -1;
-      if (MEMPHY_read (krnl->mram, (addr_t)regs->a2, &value) != 0)
-        return -1;
-      regs->a3 = value;
-      break;
-    case SYSMEM_IO_WRITE:
-      if (krnl->mram == NULL)
-        return -1;
-      if (MEMPHY_write (krnl->mram, (addr_t)regs->a2, (BYTE)regs->a3) != 0)
-        return -1;
-      break;
-    default: // Invalid memory operation code
-      printf ("Memop code: %d\n", memop);
-      return -1;
-    }
-
-  return 0;
-}

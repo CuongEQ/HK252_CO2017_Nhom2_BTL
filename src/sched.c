@@ -63,9 +63,47 @@ struct pcb_t * get_mlq_proc(void) {
 	/*TODO: get a process from PRIORITY [ready_queue].
 	 *      It worth to protect by a mechanism.
 	 * */
+	unsigned long prio;
+
+	/* Try to find a process from highest priority queue with available slot */
+	for (prio = 0; prio < MAX_PRIO; prio++) {
+		if (!empty(&mlq_ready_queue[prio]) && slot[prio] > 0) {
+			proc = dequeue(&mlq_ready_queue[prio]);
+			slot[prio]--;
+			break;
+		}
+	}
+
+	/* If no process found (all slots exhausted or all queues empty),
+	 * reset slots and try again */
+	if (proc == NULL) {
+		/* Check if there are any processes at all */
+		int has_proc = 0;
+		for (prio = 0; prio < MAX_PRIO; prio++) {
+			if (!empty(&mlq_ready_queue[prio])) {
+				has_proc = 1;
+				break;
+			}
+		}
+		if (has_proc) {
+			/* Reset all slots */
+			for (prio = 0; prio < MAX_PRIO; prio++) {
+				slot[prio] = MAX_PRIO - prio;
+			}
+			/* Try again after reset */
+			for (prio = 0; prio < MAX_PRIO; prio++) {
+				if (!empty(&mlq_ready_queue[prio]) && slot[prio] > 0) {
+					proc = dequeue(&mlq_ready_queue[prio]);
+					slot[prio]--;
+					break;
+				}
+			}
+		}
+	}
 
 	if (proc != NULL)
 		enqueue(&running_list, proc);
+	pthread_mutex_unlock(&queue_lock);
 	return proc;	
 }
 
@@ -74,12 +112,8 @@ void put_mlq_proc(struct pcb_t * proc) {
 	proc->krnl->mlq_ready_queue = mlq_ready_queue;
 	proc->krnl->running_list = &running_list;
 
-	/* TODO: put running proc to running_list 
-	 *       It worth to protect by a mechanism.
-	 * 
-	 */
-
 	pthread_mutex_lock(&queue_lock);
+	purgequeue(&running_list, proc);
 	enqueue(&mlq_ready_queue[proc->prio], proc);
 	pthread_mutex_unlock(&queue_lock);
 }
@@ -89,11 +123,6 @@ void add_mlq_proc(struct pcb_t * proc) {
 	proc->krnl->mlq_ready_queue = mlq_ready_queue;
 	proc->krnl->running_list = &running_list;
 
-	/* TODO: put running proc to running_list
-	 *       It worth to protect by a mechanism.
-	 * 
-	 */
-       
 	pthread_mutex_lock(&queue_lock);
 	enqueue(&mlq_ready_queue[proc->prio], proc);
 	pthread_mutex_unlock(&queue_lock);	
@@ -119,6 +148,9 @@ struct pcb_t * get_proc(void) {
 	 *       It worth to protect by a mechanism.
 	 * 
 	 */
+	if (!empty(&ready_queue)) {
+		proc = dequeue(&ready_queue);
+	}
 
 	pthread_mutex_unlock(&queue_lock);
 

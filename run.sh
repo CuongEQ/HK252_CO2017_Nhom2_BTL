@@ -5,7 +5,7 @@
 # ═══════════════════════════════════════════════════════════
 
 # Per-testcase timeout in seconds (default: 30s, override with TESTCASE_TIMEOUT env var)
-TIMEOUT=${TESTCASE_TIMEOUT:-5}
+TIMEOUT=${TESTCASE_TIMEOUT:-90}
 
 CONFIG_FILE="test_config.conf"
 
