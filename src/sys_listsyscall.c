@@ -10,15 +10,10 @@
 
 #include "syscall.h"
 
-int
-__sys_listsyscall (struct krnl_t *krnl, uint32_t pid, struct sc_regs *reg)
+int __sys_listsyscall(struct krnl_t *krnl, uint32_t pid, struct sc_regs* reg)
 {
-  (void)krnl;
-  (void)pid;
-  (void)reg;
+   for (int i = 0; i < syscall_table_size; i++)
+       printf("%s\n",sys_call_table[i]); 
 
-  for (int i = 0; i < syscall_table_size; i++)
-    printf ("%s\n", sys_call_table[i]);
-
-  return 0;
+   return 0;
 }
