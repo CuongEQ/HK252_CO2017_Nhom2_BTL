@@ -3,76 +3,111 @@ ld_routine
 	Loaded a process at input/proc/p0s, PID: 1 PRIO: 0
 	CPU 0: Dispatched process  1
 Time slot   1
-	Loaded a process at input/proc/p1s, PID: 2 PRIO: 15
-Time slot   2
+DEBUG: liballoc called, size=300, reg=0
+DEBUG __alloc: ENTER, size=300, rgid=0
+sysmem
+ok
+error syscallfail alloc	Loaded a process at input/proc/p1s, PID: 2 PRIO: 15
 	CPU 1: Dispatched process  2
+DEBUG: liballoc called, size=300, reg=4
+DEBUG __alloc: ENTER, size=300, rgid=4
+sysmem
+ok
+error syscallfail allocTime slot   2
 Time slot   3
 	Loaded a process at input/proc/p1s, PID: 3 PRIO: 0
-Time slot   4
-Time slot   5
+DEBUG: liballoc called, size=100, reg=1
+DEBUG __alloc: ENTER, size=100, rgid=1
+sysmem
+ok
+error syscallfail allocTime slot   4
+libwrite:412
 print_pgtbl:
- PDG=135521519054880
-Time slot   6
+ PDG=124978649411616
+Time slot   5
+	Loaded a process at input/proc/p0s, PID: 4 PRIO: 0
 	CPU 0: Put process  1 to run queue
 	CPU 0: Dispatched process  3
-	Loaded a process at input/proc/p0s, PID: 4 PRIO: 0
+Time slot   6
 Time slot   7
 Time slot   8
 	CPU 1: Put process  2 to run queue
-	CPU 1: Dispatched process  1
-print_pgtbl:
- PDG=135521519062304
+	CPU 1: Dispatched process  4
 Time slot   9
+DEBUG: liballoc called, size=300, reg=0
+DEBUG __alloc: ENTER, size=300, rgid=0
+sysmem
+ok
+error syscallfail allocTime slot  10
+DEBUG: liballoc called, size=300, reg=4
+DEBUG __alloc: ENTER, size=300, rgid=4
+sysmem
+ok
+error syscallfail allocTime slot  11
+DEBUG: liballoc called, size=100, reg=1
+DEBUG __alloc: ENTER, size=100, rgid=1
+sysmem
+ok
+error syscallfail alloc	CPU 0: Put process  3 to run queue
+	CPU 0: Dispatched process  1
+libread:364
 print_pgtbl:
- PDG=135521519062304
-Time slot  10
-print_pgtbl:
- PDG=135521519062304
-Time slot  11
-print_pgtbl:
- PDG=135521519062304
+ PDG=124978649419040
 Time slot  12
-	CPU 0: Put process  3 to run queue
-	CPU 0: Dispatched process  4
+libwrite:412
 print_pgtbl:
- PDG=135521519062304
+ PDG=124978649419040
+libwrite:412
+print_pgtbl:
+ PDG=124978649419040
 Time slot  13
-Time slot  14
-	CPU 1: Put process  1 to run queue
+	CPU 1: Put process  4 to run queue
 	CPU 1: Dispatched process  3
+libread:364
+print_pgtbl:
+ PDG=124978649419040
+Time slot  14
+libwrite:412
+print_pgtbl:
+ PDG=124978649419040
 Time slot  15
+libread:364
+print_pgtbl:
+ PDG=124978649419040
 Time slot  16
 Time slot  17
-print_pgtbl:
- PDG=135521519062304
-Time slot  18
-	CPU 0: Put process  4 to run queue
-	CPU 0: Dispatched process  1
 	CPU 1: Processed  3 has finished
 	CPU 1: Dispatched process  4
+libread:364
 print_pgtbl:
- PDG=135521519062304
+ PDG=124978649419040
+	CPU 0: Put process  1 to run queue
+	CPU 0: Dispatched process  1
+Time slot  18
 Time slot  19
+libwrite:412
 print_pgtbl:
- PDG=135521519062304
-Time slot  20
+ PDG=124978649419040
 	CPU 0: Processed  1 has finished
 	CPU 0: Dispatched process  2
+libread:364
 print_pgtbl:
- PDG=135521519062304
+ PDG=124978649419040
+Time slot  20
 Time slot  21
+libwrite:412
 print_pgtbl:
- PDG=135521519062304
+ PDG=124978649419040
+libread:364
+print_pgtbl:
+ PDG=124978649419040
 Time slot  22
-print_pgtbl:
- PDG=135521519062304
 Time slot  23
+	CPU 1: Put process  4 to run queue
+	CPU 1: Dispatched process  4
 Time slot  24
 	CPU 0: Processed  2 has finished
 	CPU 0 stopped
-	CPU 1: Put process  4 to run queue
-	CPU 1: Dispatched process  4
 Time slot  25
-Time slot  26
 	CPU 1: Processed  4 has finished
 	CPU 1 stopped

@@ -78,10 +78,11 @@ __sys_memmap (struct krnl_t *krnl, uint32_t pid, struct sc_regs *regs)
 {
   BYTE value; // Temporary variable to hold the value read from memory for
               // SYSMEM_IO_READ
-
   // Input validation
-  if (krnl == NULL || regs == NULL)
+  if (krnl == NULL || regs == NULL){
     return -1;
+
+  }
 
   int memop = (int)regs->a1; // Memory operation code
   struct pcb_t *caller
@@ -91,7 +92,6 @@ __sys_memmap (struct krnl_t *krnl, uint32_t pid, struct sc_regs *regs)
    * @bksysnet: Please note in the dual spacing design
    *            syscall implementations are in kernel space.
    */
-
   switch (memop)
     {
     case SYSMEM_MAP_OP:
