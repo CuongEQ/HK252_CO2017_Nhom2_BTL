@@ -1,0 +1,41 @@
+=============================================================
+     HƯỚNG DẪN BIÊN DỊCH VÀ CHẠY PROJECT HỆ ĐIỀU HÀNH
+=============================================================
+
+Mọi người clone code về thì làm theo đúng thứ tự các bước dưới đây.
+
+*** LƯU Ý QUAN TRỌNG TRƯỚC KHI BẮT ĐẦU ***
+
+Mở Terminal trong VS Code, CHỌN MÔI TRƯỜNG LÀ UBUNTU (WSL) hoặc DOCKER để không bị lỗi thư viện pthread.h của Linux.
+
+-------------------------------------------------------------
+BƯỚC 1: FIX LỖI ĐỊNH DẠNG FILE SCRIPT (CHỈ LÀM 1 LẦN)
+-------------------------------------------------------------
+Do code đẩy lên GitHub và tải về máy Windows hay bị dính ký tự xuống dòng CRLF, khiến Linux không đọc được file script. Mọi người chạy lệnh này để làm sạch file:
+    sed -i 's/\r$//' src/syscalltbl.sh
+
+-------------------------------------------------------------
+BƯỚC 2: BIÊN DỊCH CODE (MAKE)
+-------------------------------------------------------------
+Để dọn dẹp các file rác cũ và biên dịch lại toàn bộ mã nguồn, gõ lệnh:
+    make clean && make
+Nếu log chạy ra 1 loạt lệnh gcc mà không có dòng màu đỏ nào (Error) là thành công. Hệ thống sẽ sinh ra file thực thi `./os`.
+
+-------------------------------------------------------------
+BƯỚC 3: CHẠY TEST CASE VÀ XUẤT OUTPUT
+-------------------------------------------------------------
+* LƯU Ý: Trong code hàm main đã tự động thêm chữ "input/" vào đường dẫn rồi, nên khi chạy lệnh CHỈ CẦN GÕ TÊN FILE TEST, KHÔNG GÕ "input/".
+
+Ví dụ, muốn chạy test case "os_0_mlq_paging" và lưu kết quả vào thư mục "output", gõ lệnh sau:
+    ./os os_0_mlq_paging > output/os_0_mlq_paging.output
+
+Nếu nhóm có file kịch bản tự động, chỉ cần gõ:
+    ./run.sh
+
+-------------------------------------------------------------
+BƯỚC 4: CÁCH SO SÁNH KẾT QUẢ (DIFF CHECK) NHANH NHẤT
+-------------------------------------------------------------
+
+1. Ở cây thư mục bên trái, vào thư mục "expected", CLICK CHUỘT PHẢI vào file đáp án mẫu (VD: expected/os_0_mlq_paging.output) -> Chọn "Select for Compare".
+2. Vào thư mục "output", CLICK CHUỘT PHẢI vào file mình vừa chạy ra (VD: output/os_0_mlq_paging.output) -> Chọn "Compare with Selected".
+3. VS Code sẽ tự động bôi đỏ/xanh những chỗ khác biệt. Nếu màn hình không bôi màu gì -> Code chạy ĐÚNG 100% khớp với thầy!

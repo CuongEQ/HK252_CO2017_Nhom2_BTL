@@ -21,57 +21,20 @@
 #endif
 
 // Find the process in the given queue by PID
-static struct pcb_t *
-find_proc_in_queue (struct queue_t *q, uint32_t pid)
-{
-  // Input validation
-  if (q == NULL)
-    return NULL;
 
-  for (int i = 0; i < q->size; i++)
-    {
-      if (q->proc[i] != NULL && q->proc[i]->pid == pid)
-        return q->proc[i];
-    }
 
-  return NULL;
-}
 
 // Find the process by PID in `running_list`, `ready_queue` and
 // `mlq_ready_queue` (if supported)
+
+extern struct pcb_t *get_proc_by_pid(uint32_t pid);
+
 static struct pcb_t *
 find_proc_by_pid (struct krnl_t *krnl, uint32_t pid)
 {
-  struct pcb_t *proc = NULL;
-
-  if (krnl == NULL)
-    return NULL;
-
-  proc = find_proc_in_queue (krnl->running_list,
-                             pid); // Check in running_list first
-  if (proc != NULL)
-    goto done;
-
-  proc = find_proc_in_queue (krnl->ready_queue,
-                             pid); // Check in ready_queue next
-  if (proc != NULL)
-    goto done;
-
-#ifdef MLQ_SCHED // If MLQ_SCHED is supported, check in mlq_ready_queue last
-  if (krnl->mlq_ready_queue != NULL)
-    {
-      for (int prio = 0; prio < MAX_PRIO; prio++)
-        {
-          proc = find_proc_in_queue (&krnl->mlq_ready_queue[prio], pid);
-          if (proc != NULL)
-            goto done;
-        }
-    }
-#endif
-
-done:
-  return proc;
+  return get_proc_by_pid(pid);
 }
+
 
 int
 __sys_memmap (struct krnl_t *krnl, uint32_t pid, struct sc_regs *regs)

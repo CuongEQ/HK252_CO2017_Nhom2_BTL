@@ -64,20 +64,21 @@ struct pcb_t * get_mlq_proc(void) {
     struct pcb_t * proc = NULL;
 
     pthread_mutex_lock(&queue_lock);
-    
-    // Tìm process theo priority (MLQ)
-    int found = 0;
+
+    int is_empty = 1;
+
     for (int i = 0; i < MAX_PRIO; i++) {
         if (!empty(&mlq_ready_queue[i]) && slot[i] > 0) {
-            proc = dequeue(&mlq_ready_queue[i]);
-            slot[i]--;
-            found = 1;
-            break;
+            is_empty = 0;
+            if (slot[i] > 0) {
+                proc = dequeue(&mlq_ready_queue[i]);
+                slot[i]--;
+                break;
+            }
         }
     }
     
-    // Nếu không tìm thấy, reset slots và thử lại
-    if (!found) {
+    if (!is_empty && proc == NULL) {
         for (int i = 0; i < MAX_PRIO; i++) {
             slot[i] = MAX_PRIO - i;
         }
@@ -138,12 +139,12 @@ struct pcb_t *get_proc(void)
 
 void put_proc(struct pcb_t *proc)
 {
-    return put_mlq_proc(proc);
+    put_mlq_proc(proc);
 }
 
 void add_proc(struct pcb_t *proc)
 {
-    return add_mlq_proc(proc);
+    add_mlq_proc(proc);
 }
 #else
 struct pcb_t *get_proc(void)
@@ -202,3 +203,48 @@ void add_proc(struct pcb_t *proc)
     pthread_mutex_unlock(&queue_lock);
 }
 #endif
+
+struct pcb_t *get_proc_by_pid(uint32_t pid) {
+  struct pcb_t *proc = NULL;
+  pthread_mutex_lock(&queue_lock);
+
+  for (int i = 0; i < running_list.size; i++) {
+    if (running_list.proc[i] != NULL &&
+        running_list.proc[i]->pid == pid) {
+      proc = running_list.proc[i];
+      goto done;
+    }
+  }
+
+  for (int i = 0; i < ready_queue.size; i++) {
+    if (ready_queue.proc[i] != NULL &&
+        ready_queue.proc[i]->pid == pid) {
+      proc = ready_queue.proc[i];
+      goto done;
+    }
+  }
+
+#ifdef MLQ_SCHED
+  for (int prio = 0; prio < MAX_PRIO; prio++) {
+    for (int i = 0; i < mlq_ready_queue[prio].size; i++) {
+      if (mlq_ready_queue[prio].proc[i] != NULL &&
+          mlq_ready_queue[prio].proc[i]->pid == pid) {
+        proc = mlq_ready_queue[prio].proc[i];
+        goto done;
+      }
+    }
+  }
+#else
+  for (int i = 0; i < run_queue.size; i++) {
+    if (run_queue.proc[i] != NULL &&
+        run_queue.proc[i]->pid == pid) {
+      proc = run_queue.proc[i];
+      goto done;
+    }
+  }
+#endif
+
+done:
+  pthread_mutex_unlock(&queue_lock);
+  return proc;
+}
