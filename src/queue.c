@@ -26,23 +26,23 @@ struct pcb_t *dequeue(struct queue_t *q) {
    * */
   if (empty(q))
     return NULL;
-  /* Find the highest priority process (lowest prio)*/
-  int best_idx = -1;
-  for (int i = 0; i < q->size; i++) {
+  /* Find the highest priority process (lowest value)*/
+  int best_idx = 0;
+  for (int i = 1; i < q->size; i++) {
     if (q->proc[i] == NULL) continue;
-    if (best_idx == -1 || q->proc[i]->prio < q->proc[best_idx]->prio) {
+    if (q->proc[best_idx] == NULL ||
+        q->proc[i]->priority < q->proc[best_idx]->priority) {
       best_idx = i;
     }
   }
 
-  if (best_idx == -1) return NULL;
+  if (q->proc[best_idx] == NULL) return NULL;
   
   struct pcb_t *proc = q->proc[best_idx];
 
   for (int i = best_idx; i < q->size - 1; i++) {
     q->proc[i] = q->proc[i + 1];
   }
-
   q->proc[q->size - 1] = NULL;
   q->size--;
 

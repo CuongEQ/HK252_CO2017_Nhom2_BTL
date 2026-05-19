@@ -67,32 +67,26 @@ struct pcb_t *get_mlq_proc(void) {
   struct pcb_t *proc = NULL;
 
   pthread_mutex_lock(&queue_lock);
-
-  int found = 0;
+  /* Find queue - slot, process */
+  for (int i = 0; i < MAX_PRIO; i++) {
+    if (!empty(&mlq_ready_queue[i]) && slot[i] > 0) {
+      proc = dequeue(&mlq_ready_queue[i]);
+      slot[i]--;
+      goto found;
+    }
+  }
+  /* !found -> reset slot and loop again */
+  for (int i = 0; i < MAX_PRIO; i++)
+    slot[i] = MAX_PRIO - i;
 
   for (int i = 0; i < MAX_PRIO; i++) {
     if (!empty(&mlq_ready_queue[i]) && slot[i] > 0) {
       proc = dequeue(&mlq_ready_queue[i]);
       slot[i]--;
-      found = 1;
-      break;
+      goto found;
     }
   }
-
-  if (!found) {
-    for (int i = 0; i < MAX_PRIO; i++) {
-      slot[i] = MAX_PRIO - i;
-    }
-
-    for (int i = 0; i < MAX_PRIO; i++) {
-      if (!empty(&mlq_ready_queue[i]) && slot[i] > 0) {
-        proc = dequeue(&mlq_ready_queue[i]);
-        slot[i]--;
-        break;
-      }
-    }
-  }
-
+  found:
   if (proc != NULL)
     enqueue(&running_list, proc);
 
