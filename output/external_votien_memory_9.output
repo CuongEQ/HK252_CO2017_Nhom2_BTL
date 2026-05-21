@@ -5,13 +5,13 @@ Time slot   1
 	CPU 0: Dispatched process  1
 liballoc:170
 print_pgtbl:
- PDG=7f0b5203b010 P4g=7f0b5201a010 PUD=7f0b50ddd010 PMD=7f0b50dbc010
+ PDG=75922892b010 P4g=75922890a010 PUD=7592288e9010 PMD=7592288c8010
 Time slot   2
 	CPU 0: Put process  1 to run queue
 	CPU 0: Dispatched process  1
 liballoc:170
 print_pgtbl:
- PDG=7f0b5203b010 P4g=7f0b5201a010 PUD=7f0b50ddd010 PMD=7f0b50dbc010
+ PDG=75922892b010 P4g=75922890a010 PUD=7592288e9010 PMD=7592288c8010
 Time slot   3
 	CPU 0: Put process  1 to run queue
 	CPU 0: Dispatched process  1
@@ -23,19 +23,19 @@ Time slot   5
 	CPU 0: Dispatched process  1
 libwrite:387
 print_pgtbl:
- PDG=7f0b5203b010 P4g=7f0b5201a010 PUD=7f0b50ddd010 PMD=7f0b50dbc010
+ PDG=75922892b010 P4g=75922890a010 PUD=7592288e9010 PMD=7592288c8010
 Time slot   6
 	CPU 0: Put process  1 to run queue
 	CPU 0: Dispatched process  1
 libwrite:387
 print_pgtbl:
- PDG=7f0b5203b010 P4g=7f0b5201a010 PUD=7f0b50ddd010 PMD=7f0b50dbc010
+ PDG=75922892b010 P4g=75922890a010 PUD=7592288e9010 PMD=7592288c8010
 Time slot   7
 	CPU 0: Put process  1 to run queue
 	CPU 0: Dispatched process  1
 libwrite:387
 print_pgtbl:
- PDG=7f0b5203b010 P4g=7f0b5201a010 PUD=7f0b50ddd010 PMD=7f0b50dbc010
+ PDG=75922892b010 P4g=75922890a010 PUD=7592288e9010 PMD=7592288c8010
 Time slot   8
 	CPU 0: Put process  1 to run queue
 	CPU 0: Dispatched process  1

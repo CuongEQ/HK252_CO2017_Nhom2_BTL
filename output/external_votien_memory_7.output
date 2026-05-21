@@ -8,13 +8,13 @@ Time slot   2
 	CPU 0: Dispatched process  1
 liballoc:170
 print_pgtbl:
- PDG=7cfa60311010 P4g=7cfa602f0010 PUD=7cfa602cf010 PMD=7cfa602ae010
+ PDG=79bcfe54b010 P4g=79bcfe52a010 PUD=79bcfe509010 PMD=79bcfe4e8010
 Time slot   3
 	CPU 0: Put process  1 to run queue
 	CPU 0: Dispatched process  1
 liballoc:170
 print_pgtbl:
- PDG=7cfa60311010 P4g=7cfa602f0010 PUD=7cfa602cf010 PMD=7cfa602ae010
+ PDG=79bcfe54b010 P4g=79bcfe52a010 PUD=79bcfe509010 PMD=79bcfe4e8010
 Time slot   4
 	CPU 0: Put process  1 to run queue
 	CPU 0: Dispatched process  1

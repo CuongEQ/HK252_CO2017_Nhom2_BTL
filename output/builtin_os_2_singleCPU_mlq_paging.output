@@ -11,12 +11,12 @@ Time slot   4
 	CPU 0: Dispatched process  2
 liballoc:170
 print_pgtbl:
- PDG=785e55677010 P4g=785e55656010 PUD=785e55635010 PMD=785e55614010
+ PDG=7d56006dd010 P4g=7d56006bc010 PUD=7d560069b010 PMD=7d560067a010
 Time slot   5
 	Loaded a process at input/proc/s2, PID: 3 PRIO: 3
 liballoc:170
 print_pgtbl:
- PDG=785e55677010 P4g=785e55656010 PUD=785e55635010 PMD=785e55614010
+ PDG=7d56006dd010 P4g=7d56006bc010 PUD=7d560069b010 PMD=7d560067a010
 Time slot   6
 	CPU 0: Put process  2 to run queue
 	CPU 0: Dispatched process  1
@@ -30,7 +30,7 @@ Time slot  10
 	CPU 0: Dispatched process  2
 libfree:194
 print_pgtbl:
- PDG=785e55677010 P4g=785e55656010 PUD=785e55635010 PMD=785e55614010
+ PDG=7d56006dd010 P4g=7d56006bc010 PUD=7d560069b010 PMD=7d560067a010
 Time slot  11
 	Loaded a process at input/proc/m2s, PID: 4 PRIO: 2
 Time slot  12
@@ -38,17 +38,17 @@ Time slot  12
 	CPU 0: Dispatched process  4
 liballoc:170
 print_pgtbl:
- PDG=785e5552d010 P4g=785e5550c010 PUD=785e554eb010 PMD=785e554ca010
+ PDG=7d5600593010 P4g=7d5600572010 PUD=7d5600551010 PMD=7d5600530010
 Time slot  13
 liballoc:170
 print_pgtbl:
- PDG=785e5552d010 P4g=785e5550c010 PUD=785e554eb010 PMD=785e554ca010
+ PDG=7d5600593010 P4g=7d5600572010 PUD=7d5600551010 PMD=7d5600530010
 Time slot  14
 	CPU 0: Put process  4 to run queue
 	CPU 0: Dispatched process  4
 libfree:194
 print_pgtbl:
- PDG=785e5552d010 P4g=785e5550c010 PUD=785e554eb010 PMD=785e554ca010
+ PDG=7d5600593010 P4g=7d5600572010 PUD=7d5600551010 PMD=7d5600530010
 Time slot  15
 Time slot  16
 	Loaded a process at input/proc/s1, PID: 5 PRIO: 0
@@ -80,13 +80,13 @@ Time slot  27
 Time slot  28
 libfree:194
 print_pgtbl:
- PDG=785e5552d010 P4g=785e5550c010 PUD=785e554eb010 PMD=785e554ca010
+ PDG=7d5600593010 P4g=7d5600572010 PUD=7d5600551010 PMD=7d5600530010
 Time slot  29
 	CPU 0: Put process  4 to run queue
 	CPU 0: Dispatched process  4
 libfree:194
 print_pgtbl:
- PDG=785e5552d010 P4g=785e5550c010 PUD=785e554eb010 PMD=785e554ca010
+ PDG=7d5600593010 P4g=7d5600572010 PUD=7d5600551010 PMD=7d5600530010
 Time slot  30
 Time slot  31
 	CPU 0: Processed  4 has finished
@@ -126,7 +126,7 @@ Time slot  47
 Time slot  48
 libfree:194
 print_pgtbl:
- PDG=785e55677010 P4g=785e55656010 PUD=785e55635010 PMD=785e55614010
+ PDG=7d56006dd010 P4g=7d56006bc010 PUD=7d560069b010 PMD=7d560067a010
 Time slot  49
 	CPU 0: Put process  2 to run queue
 	CPU 0: Dispatched process  1
@@ -139,7 +139,7 @@ Time slot  52
 	CPU 0: Dispatched process  2
 libfree:194
 print_pgtbl:
- PDG=785e55677010 P4g=785e55656010 PUD=785e55635010 PMD=785e55614010
+ PDG=7d56006dd010 P4g=7d56006bc010 PUD=7d560069b010 PMD=7d560067a010
 Time slot  53
 Time slot  54
 	CPU 0: Processed  2 has finished
