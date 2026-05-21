@@ -8,10 +8,10 @@
  * for the sole purpose of studying while attending the course CO2018.
  */
 
-#include "os-mm.h"
-#include "syscall.h"
 #include "libmem.h"
+#include "os-mm.h"
 #include "queue.h"
+#include "syscall.h"
 #include <stdlib.h>
 
 #ifdef MM64
@@ -20,56 +20,61 @@
 #include "mm.h"
 #endif
 
-int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
+int
+__sys_memmap (struct krnl_t *krnl, uint32_t pid, struct sc_regs *regs)
 {
-   int memop = regs->a1;
-   BYTE value;
-   
-   /* Find the actual process PCB from the running_list using PID */
-   struct pcb_t *caller = NULL;
-   struct queue_t *running_list = krnl->running_list;
-   
-   if (running_list != NULL) {
-     int i;
-     for (i = 0; i < running_list->size; i++) {
-       if (running_list->proc[i] != NULL && running_list->proc[i]->pid == pid) {
-         caller = running_list->proc[i];
-         break;
-       }
-     }
-   }
+  int memop = regs->a1;
+  BYTE value;
 
-   /* Fallback: create a temporary PCB that references kernel structures */
-   if (caller == NULL) {
-     caller = malloc(sizeof(struct pcb_t));
-     caller->pid = pid;
-     caller->krnl = krnl;
-   }
-   
-   switch (memop) {
-   case SYSMEM_MAP_OP:
-            /* Reserved process case*/
-            vmap_pgd_memset(caller, regs->a2, regs->a3);
-            break;
-   case SYSMEM_INC_OP:
-            inc_vma_limit(caller, regs->a2, regs->a3);
-            break;
-   case SYSMEM_SWP_OP:
-            __mm_swap_page(caller, regs->a2, regs->a3);
-            break;
-   case SYSMEM_IO_READ:
-            MEMPHY_read(caller->krnl->mram, regs->a2, &value);
-            regs->a3 = value;
-            break;
-   case SYSMEM_IO_WRITE:
-            MEMPHY_write(caller->krnl->mram, regs->a2, regs->a3);
-            break;
-   default:
-            printf("Memop code: %d\n", memop);
-            break;
-   }
-   
-   return 0;
+  /* Find the actual process PCB from the running_list using PID */
+  struct pcb_t *caller = NULL;
+  struct queue_t *running_list = krnl->running_list;
+
+  if (running_list != NULL)
+    {
+      int i;
+      for (i = 0; i < running_list->size; i++)
+        {
+          if (running_list->proc[i] != NULL
+              && running_list->proc[i]->pid == pid)
+            {
+              caller = running_list->proc[i];
+              break;
+            }
+        }
+    }
+
+  /* Fallback: create a temporary PCB that references kernel structures */
+  if (caller == NULL)
+    {
+      caller = malloc (sizeof (struct pcb_t));
+      caller->pid = pid;
+      caller->krnl = krnl;
+    }
+
+  switch (memop)
+    {
+    case SYSMEM_MAP_OP:
+      /* Reserved process case*/
+      vmap_pgd_memset (caller, regs->a2, regs->a3);
+      break;
+    case SYSMEM_INC_OP:
+      inc_vma_limit (caller, regs->a2, regs->a3);
+      break;
+    case SYSMEM_SWP_OP:
+      __mm_swap_page (caller, regs->a2, regs->a3);
+      break;
+    case SYSMEM_IO_READ:
+      MEMPHY_read (caller->krnl->mram, regs->a2, &value);
+      regs->a3 = value;
+      break;
+    case SYSMEM_IO_WRITE:
+      MEMPHY_write (caller->krnl->mram, regs->a2, regs->a3);
+      break;
+    default:
+      printf ("Memop code: %d\n", memop);
+      break;
+    }
+
+  return 0;
 }
-
-
