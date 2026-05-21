@@ -24,8 +24,8 @@
             \end{minipage}
       }
       \fancyhead[R]{\small \begin{tabular}[b]{r} % Update according to document title
-            \texttt{Báo cáo bài tập buổi 7} \\
-            \texttt{Lập trình nâng cao - CO2039}
+            \texttt{Báo cáo bài tập lớn} \\
+            \texttt{Simple Operating System} \\
             \end{tabular}}
       \fancyfoot[R]{\texttt{Trang \thepage}}
 }
@@ -35,7 +35,8 @@
 %----Locale and Font settings----
 \usepackage[vietnamese]{babel}
 \usepackage{fontspec}
-\newfontfamily\mintedfont{JetBrains Mono} % For code blocks
+% Fallback font to prevent compilation errors if JetBrains Mono is missing
+\IfFontExistsTF{JetBrains Mono}{\newfontfamily\mintedfont{JetBrains Mono}}{\newfontfamily\mintedfont{Courier New}}
 %----Hyperlinks----
 \usepackage[hidelinks]{hyperref}
 \usepackage{xurl}
@@ -44,14 +45,6 @@
 \usepackage{amssymb}
 %----Flowcharts----
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows,positioning}
-\tikzstyle{client} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=blue!30]
-\tikzstyle{context} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=green!30]
-\tikzstyle{strategy} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=orange!30]
-\tikzstyle{concrete} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=yellow!30]
-\tikzstyle{aggregation} = [diamond, draw=black]
-\tikzstyle{implementation} = [dashed, ->, >=stealth]
-\tikzstyle{association} = [->, >=stealth]
 %----Tables----
 \usepackage{tabularx}
 \usepackage{longtable}
@@ -73,172 +66,406 @@
         \textbf{\large ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH} \\
         \textbf{\large TRƯỜNG ĐẠI HỌC BÁCH KHOA} \\
         \includegraphics[width=0.8\textwidth]{BK_logo.png} \\
-        \textbf{\Huge BÁO CÁO BÀI TẬP BUỔI 7 \\ CODE SMELLS} \\
+        \vspace{2cm}
+        \textbf{\Huge BÁO CÁO BÀI TẬP LỚN \\ SIMPLE OPERATING SYSTEM} \\
 
         \vfill
 
         \Large{\begin{tabular}{ll}
-                \textbf{Họ và tên:}  & Nguyễn Minh Cường     \\
-                \textbf{MSSV:}       & 2410432               \\
-                \textbf{Nhóm lớp:}   & L01                   \\
-                \textbf{Giảng viên:} & Trần Trương Tuấn Phát \\
+                \textbf{Nhóm lớp:}      & Nhóm 2 - Lớp L01      \\
+                \textbf{Giảng viên HD:} & Thầy Nguyễn Tuấn Huy  \\
+                \textbf{Học phần:}      & CO2017 - Hệ điều hành \\
             \end{tabular}}
 
         \vfill
 
-        \textbf{TPHCM, 03 - 2026}
+        \textbf{TPHCM, 05 - 2026}
     \end{center}
 \end{titlepage}
+
+\section*{Báo cáo Phân công nhiệm vụ và Kết quả đạt được}
+
+\begin{center}
+    \begin{table}[H]
+        \centering
+        \begin{tabularx}{\textwidth}{|c|X|c|X|c|}
+            \hline
+            \textbf{STT} & \centerline{\textbf{Họ và tên}} & \textbf{MSSV} & \centerline{\textbf{Nhiệm vụ}}                       & \textbf{Kết quả} \\ \hline
+            1            & Nguyễn Minh Cường               & 2410432       & Hiện thực Syscall, Soạn báo cáo, Định hướng làm việc & 100\%            \\ \hline
+            2            & Trần Gia Hân                    & 2052464       &                                                      & \%               \\ \hline
+            3            & Phạm Nguyễn Thảo Ly             & 2411995       &                                                      & \%               \\ \hline
+            4            & Lưu Bảo Trang                   & 2413556       &                                                      & \%               \\ \hline
+            5            & Lê Minh Anh                     & 2410089       &                                                      & \%               \\ \hline
+        \end{tabularx}
+
+        Nhóm trưởng: Nguyễn Minh Cường - MSSV: 2410432 \\
+        SĐT: 0866776574. Email: cuong.nguyenminhk24@hcmut.edu.vn
+    \end{table}
+\end{center}
+\pagebreak
 
 \tableofcontents
 \pagebreak
 
-\section{Bloaters: Data Clumps}
-\subsection{Mã nguồn ví dụ}
-\begin{minted}{java}
-public class CustomerService {
-    public void addCustomer(String name, String street, String city, String zipCode) { }
-    public void updateAddress(String customerId, String street, String city, String zipCode) { }
-}
-\end{minted}
+\section{Tổng quan}
 
-\subsection{Giải pháp}
-\begin{minted}{java}
-public class Address {
-    private String street, city, zipCode;
-    // Constructor, getters, setters
-}
+\subsection{Giới thiệu về chủ đề BTL}
+Hệ điều hành là một thành phần cốt lõi của hệ thống máy tính, đóng vai trò quản lý tài nguyên phần cứng và cung cấp môi trường để các ứng dụng phần mềm hoạt động. Bài tập lớn này tập trung vào việc nghiên cứu, mô phỏng và xây dựng một Hệ điều hành đơn giản (Simple Operating System - SimpleOS). Qua quá trình phát triển dự án, sinh viên sẽ tìm hiểu sâu sắc về cách thức nhân (kernel) của hệ điều hành giao tiếp với các tiến trình người dùng (user processes), cơ chế phân bổ tài nguyên CPU, cũng như kỹ thuật quản lý bộ nhớ phức tạp.
 
-public class CustomerService {
-    public void addCustomer(String name, Address address) { }
-    public void updateAddress(String customerId, Address address) { }
-}
-\end{minted}
+\subsection{Mục tiêu đạt được}
+Mục tiêu chính của bài tập lớn là hiện thực thành công một số phân hệ trọng yếu của OS, bao gồm:
+\begin{itemize}
+    \item \textbf{Phân hệ Lập lịch (Scheduler):} Cài đặt thuật toán lập lịch Multi-Level Queue (MLQ) để quản lý hàng đợi tiến trình theo mức độ ưu tiên, đảm bảo phân bổ thời gian CPU hợp lý và tránh hiện tượng chết đói (starvation).
+    \item \textbf{Phân hệ Quản lý Bộ nhớ (Memory Management):} Triển khai hệ thống bộ nhớ phân trang ảo đa cấp (5-level paging) hỗ trợ kiến trúc 64-bit, kết hợp cơ chế phân đoạn (segmentation) bảo vệ vùng nhớ.
+    \item \textbf{Giao tiếp và Đồng bộ hóa:} Đảm bảo an toàn không gian Kernel qua cơ chế PID Passing khi gọi System call, và sử dụng khóa Mutex để chống tranh chấp (Race Condition) trong môi trường xử lý đa nhân.
+\end{itemize}
 
-\subsection{Giải thích}
-Data Clumps xảy ra khi các nhóm dữ liệu liên quan được sử dụng cùng nhau ở nhiều nơi trong code mà không có một cấu trúc rõ ràng để đại diện cho chúng. Điều này làm cho code trở nên khó hiểu và dễ bị lỗi khi cần thay đổi. Bằng cách tạo \mintinline{java}|class Address|, chúng ta đã nhóm các thuộc tính liên quan lại với nhau, làm cho code dễ đọc hơn và dễ bảo trì hơn.
 
-\section{Object-Oriented Abusers: Switch Statements}
-\subsection{Mã nguồn ví dụ}
-\begin{minted}{java}
-public class Payroll {
-    public double calculatePay(Employee emp) {
-        switch (emp.getType()) {
-            case "MANAGER": return emp.getBaseSalary() + 5000;
-            case "DEVELOPER": return emp.getBaseSalary() + 2000;
-            default: return emp.getBaseSalary();
+\pagebreak
+
+\section{Giao diện System Call}
+
+\subsection{Giới thiệu chung}
+Đóng vai trò là giao diện giao tiếp cơ bản giữa các ứng dụng và nhân hệ điều hành (kernel). Thành phần này giúp kiểm soát quyền truy cập hệ thống và đảm bảo an toàn khi các tiến trình người dùng cần tương tác với tài nguyên phần cứng.
+
+\subsection{Câu hỏi đặt ra}
+\paragraph{Câu hỏi}: What are the advantages and disadvantages of using the unified system call interface for manipulating different system components, i.e. read/write/free for files, memory and I/O devices?
+
+\paragraph{Trả lời}:
+\begin{itemize}
+    \item \textbf{Ưu điểm:}
+          \begin{itemize}
+              \item \textbf{Tính trừu tượng hóa và đơn giản:} Việc sử dụng giao diện đồng nhất (chuẩn POSIX như \textit{Everything is a file}) cho phép lập trình viên tương tác với các thiết bị khác nhau bằng cùng một tập hợp hàm (read/write/open/close). Điều này làm giảm đáng kể độ phức tạp của mã nguồn ở user-space.
+              \item \textbf{Tính linh hoạt (Portability):} Dễ dàng chuyển đổi giữa các thiết bị hoặc thay đổi cài đặt phần cứng bên dưới mà không làm ảnh hưởng đến mã nguồn ở tầng ứng dụng.
+          \end{itemize}
+    \item \textbf{Nhược điểm:}
+          \begin{itemize}
+              \item \textbf{Giảm hiệu năng (Performance overhead):} Dữ liệu phải đi qua nhiều lớp trừu tượng trong OS (VFS, device drivers) trước khi thực sự đến được phần cứng, làm tăng độ trễ (latency).
+              \item \textbf{Xử lý lỗi phức tạp (Error handling complexity):} Một mã lỗi chung (ví dụ \texttt{EIO}) trả về từ giao diện đồng nhất có thể xuất phát từ nhiều nguyên nhân khác biệt tùy thuộc vào thiết bị cụ thể, làm cho quá trình debug và xử lý ngoại lệ khó khăn hơn.
+              \item \textbf{Mất đi một số tính năng đặc thù:} Giao diện chuẩn đôi khi quá chung chung và không thể tận dụng hết các lệnh điều khiển nâng cao của phần cứng chuyên dụng (phải bù đắp bằng các hàm như \texttt{ioctl}).
+          \end{itemize}
+\end{itemize}
+
+\paragraph{Câu hỏi}: When a system call executes too long time, how does the Operating system detect and handle the case?
+
+\paragraph{Trả lời}:
+\begin{itemize}
+    \item \textbf{Phát hiện:} Hệ điều hành sử dụng cơ chế ngắt bộ định thời (Timer Interrupt) do phần cứng cung cấp hoặc Watchdog Timer. Nếu thời gian thực thi vượt quá lượng thời gian (time slice hoặc timeout) được phân bổ, ngắt phần cứng sẽ được kích hoạt, đánh thức bộ lập lịch của OS.
+    \item \textbf{Xử lý:} OS sẽ tiến hành thu hồi quyền điều khiển CPU (preemption). Hệ thống sẽ lưu trạng thái ngữ cảnh (context) hiện tại của tiến trình đang gọi system call. OS có thể:
+          \begin{itemize}
+              \item Ngắt và đưa tiến trình quay lại hàng đợi Ready (nếu system call được thiết kế ở dạng có thể ngắt quãng - interruptible).
+              \item Kill tiến trình nếu nhận thấy có dấu hiệu treo hoặc vi phạm chính sách cấp phát tài nguyên.
+          \end{itemize}
+\end{itemize}
+\pagebreak
+
+\section{Lập lịch tiến trình (Scheduler)}
+
+\subsection{Giới thiệu chung}
+Thao tác lập lịch của hệ điều hành sử dụng thuật toán \textbf{Multi-Level Queue (MLQ)} được thiết kế tương nhân (Kernel) Linux. Hệ thống duy trì mảng các hàng đợi \texttt{ready\_queue}, mỗi hàng đợi tương ứng với một mức độ ưu tiên (\texttt{MAX\_PRIO} = 140).
+
+\subsection{Thuật toán MLQ}
+Hàm \texttt{get\_mlq\_proc} thể hiện rõ thuật toán MLQ ưu tiên duyệt qua các hàng đợi có priority từ cao đến thấp và đảm bảo cấp số slot nhất định cho mỗi hàng đợi:
+\begin{minted}{c}
+// From src/sched.c
+struct pcb_t * get_mlq_proc(void) {
+    struct pcb_t * proc = NULL;
+    pthread_mutex_lock(&queue_lock);
+    unsigned long prio;
+
+    /* Try to find a process from highest priority queue with available slot */
+    for (prio = 0; prio < MAX_PRIO; prio++) {
+        if (!empty(&mlq_ready_queue[prio]) && slot[prio] > 0) {
+            proc = dequeue(&mlq_ready_queue[prio]);
+            slot[prio]--;
+            break;
         }
     }
-}
-\end{minted}
-
-\subsection{Giải pháp}
-\begin{minted}{java}
-public abstract class Employee {
-    protected double baseSalary;
-    public abstract double calculatePay();
-}
-
-public class Manager extends Employee {
-    public double calculatePay() { return baseSalary + 5000; }
-}
-
-public class Developer extends Employee {
-    public double calculatePay() { return baseSalary + 2000; }
-}
-\end{minted}
-
-\subsection{Giải thích}
-Switch Statements thường được sử dụng để xử lý các trường hợp khác nhau dựa trên một thuộc tính của đối tượng. Điều này vi phạm nguyên tắc OOP vì nó làm cho code trở nên cứng nhắc và khó mở rộng. Bằng cách sử dụng kế thừa và đa hình, chúng ta có thể loại bỏ switch statement và cho phép mỗi lớp con tự xử lý logic tính toán của mình, làm cho code dễ bảo trì và mở rộng hơn.
-
-\section{Change Preventers: Divergent Change}
-\subsection{Mã nguồn ví dụ}
-\begin{minted}{java}
-public class Report {
-    public void generateData() { /* Logic tổng hợp dữ liệu */ }
-    public void printReport() { /* Logic định dạng văn bản */ }
-    public void exportToPDF() { /* Logic xuất file PDF */ }
-}
-\end{minted}
-
-\subsection{Giải pháp}
-\begin{minted}{java}
-public class ReportData {
-    public void generateData() { /* Logic tổng hợp dữ liệu */ }
-}
-
-public class ReportPrinter {
-    public void print(ReportData data) { /* Logic định dạng văn bản */ }
-}
-
-public class ReportExporter {
-    public void exportToPDF(ReportData data) { /* Logic xuất file PDF */ }
-}
-\end{minted}
-
-\subsection{Giải thích}
-Divergent Change xảy ra khi một lớp phải thay đổi vì nhiều lý do khác nhau, thường là do nó chứa nhiều chức năng. Điều này làm cho code trở nên khó bảo trì và dễ bị lỗi khi cần thay đổi. Bằng cách tách các chức năng khác nhau thành các lớp riêng biệt, chúng ta có thể giảm sự phụ thuộc giữa các phần của code và làm cho nó dễ bảo trì hơn.
-
-\section{Dispensables: Data Class}
-\subsection{Mã nguồn ví dụ}
-\begin{minted}{java}
-public class Rectangle {
-    public double width;
-    public double height;
-    // Getters and Setters
-}
-
-public class AreaCalculator {
-    public double calculateArea(Rectangle rect) {
-        return rect.getWidth() * rect.getHeight();
-    }
-}
-\end{minted}
-
-\subsection{Giải pháp}
-\begin{minted}{java}
-public class Rectangle {
-    private double width;
-    private double height;
+    // ... (Khôi phục slot nếu tất cả các queue cạn slot)
     
-    public double getArea() {
-        return width * height;
-    }
+    if (proc != NULL)
+        enqueue(&running_list, proc);
+    pthread_mutex_unlock(&queue_lock);
+    return proc;	
 }
 \end{minted}
 
-\subsection{Giải thích}
-Data Class là những lớp chỉ chứa dữ liệu mà không có logic nào liên quan đến dữ liệu đó. Điều này làm cho code trở nên rời rạc và khó sử dụng. Bằng cách thêm phương thức \mintinline{java}|double getArea()| vào \mintinline{java}|class Rectangle|, chúng ta đã kết hợp dữ liệu và logic liên quan lại với nhau, làm cho code dễ sử dụng hơn và tuân thủ nguyên tắc OOP hơn.
+\subsection{Biểu đồ Gantt}
+Dưới đây là biểu đồ Gantt minh họa thứ tự thực thi của các tiến trình trên 1 CPU theo chính sách MLQ đối với Testcase \texttt{os\_1\_singleCPU\_mlq}.
 
-\section{Couplers: Feature Envy}
-\subsection{Mã nguồn ví dụ}
-\begin{minted}{java}
-public class Order {
-    private double weight;
-    private double distance;
-    // Getters
-}
+% Specification for visualizing the Gantt chart:
+% Processes arrive at different time slots and are dispatched.
+% With MLQ, when multiple processes are in the ready queue, they are executed based on their queue's priority and the remaining slots of that queue.
+% To visualize it later: Change the coordinates (\x, \y) to match your precise testcase traces (e.g. process start time and duration) and update the process names/labels at the Y axis.
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[x=0.6cm, y=0.8cm]
+        % Draw grid and axes
+        \draw[thick, ->] (0,0) -- (19,0) node[right] {Time (slot)};
+        \draw[thick, ->] (0,0) -- (0,6) node[above] {Process};
 
-public class ShippingCalculator {
-    public double getShippingCost(Order order) {
-        // Feature Envy: Gọi liên tục vào Order
-        return order.getWeight() * order.getDistance() * 1.5; 
-    }
-}     
+        \foreach \x in {0,2,4,6,8,10,12,14,16,18}
+        \draw (\x, 1pt) -- (\x, -3pt) node[below] {\x};
+
+        \node[left] at (0, 1) {P1 (prio 3)};
+        \node[left] at (0, 2) {P2 (prio 3)};
+        \node[left] at (0, 3) {P5 (prio 2)};
+        \node[left] at (0, 4) {P6 (prio 1)};
+        \node[left] at (0, 5) {P8 (prio 0)};
+
+        % Draw blocks
+        \filldraw[fill=blue!30, draw=black] (2, 0.6) rectangle (4, 1.4); % P1
+        \filldraw[fill=red!30, draw=black] (4, 1.6) rectangle (6, 2.4);  % P2
+        \filldraw[fill=blue!30, draw=black] (6, 0.6) rectangle (8, 1.4); % P1
+        \filldraw[fill=green!30, draw=black] (8, 2.6) rectangle (10, 3.4); % P5
+        \filldraw[fill=yellow!30, draw=black] (10, 3.6) rectangle (12, 4.4); % P6
+        \filldraw[fill=yellow!30, draw=black] (12, 3.6) rectangle (14, 4.4); % P6
+        \filldraw[fill=yellow!30, draw=black] (14, 3.6) rectangle (16, 4.4); % P6
+        \filldraw[fill=purple!30, draw=black] (16, 4.6) rectangle (18, 5.4); % P8
+
+    \end{tikzpicture}
+
+    \caption{Biểu đồ Gantt chạy tiến trình từ testcase \texttt{os\_1\_singleCPU\_mlq\_paging}}
+\end{figure}
+
+\subsection{Phân tích thuật toán và cấp phát slot}
+Theo thuật toán MLQ đã đề cập ở trên, hệ thống sử dụng tham số \texttt{MAX\_PRIO = 140}. Quỹ thời gian (số lượng slot) được cấp cho từng hàng đợi (Queue) tính theo công thức:
+
+$$\text{Slots}_{\text{Queue}\_i} = \text{MAX\_PRIO} - i = 140 - i$$
+
+Áp dụng trực tiếp vào các tiến trình trong biểu đồ Gantt:
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|c|c|c|X|}
+        \hline
+        \textbf{Tiến trình} & \textbf{Priority ($i$)} & \textbf{Quỹ Slot Queue} & \textbf{Phân tích thực thi}                                                    \\ \hline
+        P1                  & 3                       & $140 - 3 = 137$         & Chạy từ $t=2 \rightarrow 4$ (dùng 2 slots), sau đó kết thúc hoặc nhường CPU.   \\ \hline
+        P2                  & 3                       & $137$                   & Kế thừa quỹ slot của Queue 3. Chạy từ $t=4 \rightarrow 8$ (dùng 4 slots).      \\ \hline
+        P5                  & 2                       & $140 - 2 = 138$         & Tại $t=8$, P5 xuất hiện ở Queue 2. Vì $2 < 3$, CPU lập tức tước quyền Queue 3. \\ \hline
+        P6                  & 1                       & $140 - 1 = 139$         & Tại $t=12$, P6 (Queue 1) chiếm CPU từ Queue 2 do độ ưu tiên cao hơn.           \\ \hline
+        P8                  & 0                       & $140 - 0 = 140$         & Tại $t=16$, P8 (Queue 0) chiếm quyền tuyệt đối với quỹ 140 slots.              \\ \hline
+    \end{tabularx}
+    \caption{Phân bổ quỹ slot và phân tích quá trình chiếm CPU của các tiến trình}
+\end{table}
+
+\paragraph{Giải thích kết quả mô phỏng}: Mặc dù quỹ slot của các hàng đợi là rất lớn (từ 137 đến 140 slots), nhưng do đặc tính preemptive (chiếm quyền) của thuật toán, bất cứ khi nào có tiến trình mới lọt vào hàng đợi có mức ưu tiên cao hơn (chỉ số \texttt{prio} nhỏ hơn), bộ lập lịch lập tức tước quyền CPU của hàng đợi hiện tại để giao cho hàng đợi mới. Tiến trình P8 (prio 0) mang mức ưu tiên cao nhất nên không thể bị preempt.
+
+\subsection{Câu hỏi đặt ra}
+\paragraph{Câu hỏi}: Considering the impactness of MLQ detailed policies, what is the benefit of each policy?
+
+\paragraph{Trả lời}:
+\begin{itemize}
+    \item \textbf{Phân tầng độ ưu tiên:} Giúp OS tách biệt rõ ràng giữa các loại tiến trình (ví dụ: tác vụ tương tác yêu cầu phản hồi nhanh vs. tác vụ tính toán nặng).
+    \item \textbf{Slot Allocation (Định mức time slice theo độ ưu tiên):} Trong đồ án, thuật toán quy định mỗi hàng đợi có một số lượng slot nhất định bằng \texttt{MAX\_PRIO - prio}. Lợi ích của chính sách này là bảo đảm sự công bằng có kiểm soát:
+          \begin{itemize}
+              \item Tiến trình có mức ưu tiên cao (giá trị \texttt{prio} thấp) sẽ nhận được nhiều slot (time slice) hơn.
+              \item Tiến trình ưu tiên thấp vẫn sẽ được cấp một lượng slot tối thiểu, giúp giải quyết hoàn toàn vấn đề "Starvation" (chết đói tài nguyên) vốn thường gặp ở các chính sách Priority Scheduling thuần túy.
+          \end{itemize}
+\end{itemize}
+
+\pagebreak
+
+\section{Quản lý bộ nhớ (Memory Management)}
+
+\subsection{Giới thiệu chung}
+Trong OS được hiện thực ở BTL này, bộ nhớ được quản lý bằng kỹ thuật kết hợp phân đoạn (segmentation) theo \texttt{vm\_area} và phân trang (paging).
+
+\subsection{Cấp phát bộ nhớ ảo (Data Segment)}
+Hệ thống cung cấp một mảng logic liền kề các đối tượng \texttt{vm\_area} dành riêng cho mỗi tiến trình. Khi gặp lệnh \texttt{alloc}, thư viện sẽ tính toán không gian, tạo vùng lưu trữ thông qua \texttt{vm\_rg\_struct} trên không gian dữ liệu Data/Heap có giới hạn bởi \texttt{sbrk}.
+
+Dữ liệu in ra từ tiến trình mô phỏng \texttt{os\_1\_mlq\_paging}:
+
+\begin{minted}{text}
+liballoc:170
+print_pgtbl:
+ PDG=702b01815010 P4g=702b004dc010 PUD=702b004bb010 PMD=702b0049a010
 \end{minted}
 
-\subsection{Giải pháp}
-\begin{minted}{java}
-public class Order {
-    private double weight;
-    private double distance;
+Điều này cho thấy hệ điều hành khi gặp lệnh \texttt{alloc} sẽ gọi \texttt{liballoc} trích xuất vùng bộ nhớ logic, sau đó ngay lập tức thực hiện ánh xạ phân trang và in ra các gốc thư mục trang tương ứng.
 
-    public double getShippingCost() {
-        return this.weight * this.distance * 1.5;
-    }
+Để làm rõ hơn, quá trình cấp phát vùng nhớ trong Data segment (Heap) làm thay đổi ranh giới \texttt{sbrk} và cập nhật danh sách các vùng trống (\texttt{vm\_freerg\_list}). Giả sử tiến trình gọi lệnh \texttt{alloc(size = 256)}, cấu trúc bộ nhớ thay đổi như sau:
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|l|X|X|}
+        \hline
+        \textbf{Thành phần}                & \textbf{Trước khi cấp phát (\texttt{alloc})}                                                   & \textbf{Sau khi cấp phát (thành công)}                                                                                   \\ \hline
+        \textbf{Pointer \texttt{sbrk}}     & Trỏ tại địa chỉ $X$ (ranh giới Heap logic hiện tại).                                           & Dịch chuyển lên $X + 256$ (ranh giới mới mở rộng).                                                                       \\ \hline
+        \textbf{\texttt{vm\_area} size}    & Kích thước vùng Data logic bằng $N$.                                                           & Kích thước vùng Data tăng lên $N + 256$.                                                                                 \\ \hline
+        \textbf{\texttt{vmaid}}            & Đã ánh xạ các vùng quản lý cũ.                                                                 & Sinh ra một \texttt{vm\_rg\_struct} mới quản lý từ $X \rightarrow X+256$.                                                \\ \hline
+        \textbf{\texttt{vm\_freerg\_list}} & Có thể chứa các Segment nhỏ chưa dùng (ví dụ: $128$ bytes) do các lệnh \texttt{free} trước đó. & Nếu Segment cũ không đủ $256$ bytes, cấp phát từ \texttt{sbrk} mới. Nếu \texttt{free}, vùng mới sẽ được đưa lại vào đây. \\ \hline
+    \end{tabularx}
+
+    \caption{Trạng thái bộ nhớ Data Segment trước và sau khi thực thi lệnh alloc}
+\end{table}
+
+\paragraph{Phân tích sự dịch chuyển}
+\begin{itemize}
+    \item \textbf{Tìm kiếm vùng trống:} Hàm \texttt{alloc} đầu tiên duyệt qua \texttt{vm\_freerg\_list} để xem có vùng nhớ (region) nào đã được giải phóng và có kích thước $\ge 256$ bytes hay không (Cơ chế First-Fit).
+    \item \textbf{Mở rộng sbrk:} Nếu không có khối trống đủ lớn, thư viện sẽ gọi System call \texttt{sys\_memmap} (memop = \texttt{SYSMEM\_INC\_OP}) đẩy con trỏ \texttt{sbrk} của tiến trình lên $256$ bytes để lấy không gian mới.
+    \item \textbf{Cập nhật Page Table:} Khoảng không gian ảo mới thu được ($X \rightarrow X + 256$) sẽ được tiến hành ánh xạ vào các khung trang vật lý (Frame). Hiện trạng không gian logic này luôn bảo đảm không bị phân mảnh ngoài.
+\end{itemize}
+
+\subsection{Cơ chế truyền tham số (PID Passing) cho System Call}
+
+Nhằm đảm bảo an toàn không gian bộ nhớ nhân (Kernel Space), người dùng tuyệt đối không được phép truy cập hoặc truyền trực tiếp con trỏ cấu trúc \texttt{pcb\_t} của tiến trình vào các hàm. Thay vào đó, trong các hàm cấp phát bộ nhớ từ thư viện (\texttt{libmem.c}), hệ thống chỉ gọi System Call và truyền vào mã định danh tiến trình (\texttt{PID}).
+
+Ở tầng Kernel, hàm quản lý sẽ dùng vòng lặp duyệt qua danh sách \texttt{running\_list} hoặc \texttt{ready\_queue} bên trong \texttt{struct krnl\_t} để tra cứu con trỏ \texttt{pcb\_t} thông qua đối sánh \texttt{PID}. Khi lấy được \texttt{pcb}, nó mới thực hiện trỏ tới bảng cấp phát \texttt{mm\_struct} và tiến hành thêm bớt vùng nhớ. Cơ chế bảo vệ này ngăn chặn nguy cơ mã nguồn độc hại ở \textit{User Space} sửa đổi các thuộc tính hệ thống nằm ở \textit{Kernel Space}.
+
+Đoạn mã sau minh hoạ việc Kernel tìm kiếm con trỏ \texttt{pcb\_t} từ \texttt{PID} được truyền vào ở System Call \texttt{sys\_memmap}:
+\begin{minted}{c}
+// From src/sys_mem.c
+int __sys_memmap(struct krnl_t *krnl, uint32_t pid, struct sc_regs* regs)
+{
+   int memop = regs->a1;
+   /* Find the actual process PCB from the running_list using PID */
+   struct pcb_t *caller = NULL;
+   struct queue_t *running_list = krnl->running_list;
+   
+   if (running_list != NULL) {
+     int i;
+     for (i = 0; i < running_list->size; i++) {
+       if (running_list->proc[i] != NULL && running_list->proc[i]->pid == pid) {
+         caller = running_list->proc[i];
+         break;
+       }
+     }
+   }
 }
 \end{minted}
 
-\subsection{Giải thích}
-Feature Envy xảy ra khi một phương thức trong một lớp thường xuyên truy cập vào dữ liệu của một lớp khác hơn là dữ liệu của chính nó. Điều này làm cho code trở nên phụ thuộc và khó bảo trì. Bằng cách di chuyển logic tính toán chi phí vận chuyển vào \mintinline{java}|class Order|, chúng ta đã giảm sự phụ thuộc giữa các lớp và làm cho code dễ bảo trì hơn.
+\subsection{Câu hỏi đặt ra}
+\paragraph{Câu hỏi}: What is the primary motivation for combining segmentation with paging in memory management? How does this hybrid approach address limitations inherent in using either tech-nique alone?
+
+\paragraph{Trả lời}:
+\begin{itemize}
+    \item \textbf{Động lực chính:} Phân đoạn giúp phản ánh góc nhìn logic của chương trình (chia tách rõ ràng không gian cho Code, Data, Stack) nhằm hỗ trợ chia sẻ và bảo vệ bộ nhớ. Tuy nhiên, phân đoạn lại gây ra hiện tượng phân mảnh ngoài (external fragmentation). Ngược lại, phân trang giúp quản lý bộ nhớ vật lý cực kỳ hiệu quả, loại bỏ phân mảnh ngoài do các khung trang (frame) có cùng kích thước, nhưng lại không có khái niệm về mặt logic đối tượng.
+    \item \textbf{Cách tiếp cận kết hợp:} Đầu tiên chia không gian bộ nhớ ảo thành các đoạn logic (\texttt{vm\_area}). Sau đó, thay vì tải nguyên một đoạn liên tục vào bộ nhớ vật lý, mỗi đoạn sẽ tiếp tục được phân trang. Nhờ vậy, OS tận dụng được ưu điểm chống phân mảnh ngoài của phân trang mà vẫn giữ được khả năng bảo vệ và tách biệt các vùng nhớ logic của phân đoạn.
+\end{itemize}
+
+\paragraph{Câu hỏi}: What are the advantages and disadvantages of paging and contiguous memory allocation?
+
+\paragraph{Trả lời}:
+\begin{itemize}
+    \item \textbf{Cấp phát bộ nhớ liên tục (Contiguous Memory Allocation):}
+          \begin{itemize}
+              \item \textit{Ưu điểm:} Đơn giản, tốc độ truy cập nhanh vì không cần cơ chế dịch địa chỉ phức tạp thông qua bảng trang.
+              \item \textit{Nhược điểm:} Gây ra phân mảnh ngoài nghiêm trọng theo thời gian. Rất khó để cấp phát vùng nhớ mới cho các tiến trình có kích thước lớn nếu không có một khối liên tục đủ lớn, mặc dù tổng dung lượng bộ nhớ trống vẫn đủ.
+          \end{itemize}
+    \item \textbf{Phân trang (Paging):}
+          \begin{itemize}
+              \item \textit{Ưu điểm:} Loại bỏ hoàn toàn phân mảnh ngoài. Cho phép không gian nhớ ảo liên tục được ánh xạ vào các khung nhớ vật lý nằm rải rác, giúp việc cấp phát cực kỳ linh hoạt. Dễ dàng triển khai bộ nhớ ảo (Swapping).
+              \item \textit{Nhược điểm:} Bị phân mảnh trong (internal fragmentation) ở trang nhớ cuối cùng. Yêu cầu chi phí bộ nhớ bổ sung để lưu trữ bảng trang và cần sự hỗ trợ phần cứng phức tạp (như MMU, TLB) để dịch địa chỉ mà không làm giảm quá nhiều tốc độ truy cập bộ nhớ.
+          \end{itemize}
+\end{itemize}
+
+\pagebreak
+
+\section{Phân trang đa cấp (Multi-level Paging)}
+
+\subsection{Giới thiệu chung}
+Để hỗ trợ không gian địa chỉ 64-bit khổng lồ, OS cài đặt cơ chế dịch địa chỉ phân trang 5 cấp (5-level paging), bao gồm: \texttt{PGD}, \texttt{P4D}, \texttt{PUD}, \texttt{PMD}, và \texttt{PT}.
+
+\subsection{Cơ chế ánh xạ địa chỉ đa cấp (Address Translation Scheme)}
+Đối với kiến trúc 64-bit sử dụng 5 mức trong lý thuyết và OS này, cấu trúc địa chỉ 64-bit được dịch theo các trường:
+
+\begin{itemize}
+    \item \textbf{PGD (bit 48-56):} Page Global Directory.
+    \item \textbf{P4D (bit 39-47):} Page Level 4 Directory.
+    \item \textbf{PUD (bit 30-38):} Page Upper Directory.
+    \item \textbf{PMD (bit 21-29):} Page Middle Directory.
+    \item \textbf{PT (bit 12-20):} Page Table.
+    \item \textbf{Offset (bit 0-11):} Độ lệch offset của biến bên trong trang kích thước 4KB.
+\end{itemize}
+
+Lấy kết quả mô phỏng của hệ thống \texttt{os\_1\_mlq\_paging}:
+\begin{minted}{text}
+print_pgtbl:
+ PDG=702b01815010 P4g=702b004dc010 PUD=702b004bb010 PMD=702b0049a010
+\end{minted}
+
+Kết quả in ra chứng tỏ cơ chế dịch đa cấp hoạt động chính xác. Khi CPU cần sinh địa chỉ, thư viện đã xin thành công việc tạo các gốc thư mục mức cao (\texttt{PGD}, \texttt{P4g}, \texttt{PUD}, \texttt{PMD}) trên không gian User Space để chuẩn bị ánh xạ đến khung trang vật lý (Frame) thông qua PT (Page table cuối). Quá trình phân giải sẽ rẽ qua từng tầng để bóc tách các bits của địa chỉ ảo thành index để dịch xuống mức thư mục con trực tiếp.
+
+Dưới đây là đoạn mã nguồn thực hiện trích xuất từng index tương ứng để duyệt các mức trang từ địa chỉ ảo 64 bit:
+
+\begin{minted}{c}
+// From src/mm64.c
+int get_pd_from_address(addr_t addr, addr_t* pgd, addr_t* p4d, 
+                        addr_t* pud, addr_t* pmd, addr_t* pt)
+{
+    *pgd = (addr & PAGING64_ADDR_PGD_MASK) >> PAGING64_ADDR_PGD_LOBIT;
+    *p4d = (addr & PAGING64_ADDR_P4D_MASK) >> PAGING64_ADDR_P4D_LOBIT;
+    *pud = (addr & PAGING64_ADDR_PUD_MASK) >> PAGING64_ADDR_PUD_LOBIT;
+    *pmd = (addr & PAGING64_ADDR_PMD_MASK) >> PAGING64_ADDR_PMD_LOBIT;
+    *pt  = (addr & PAGING64_ADDR_PT_MASK)  >> PAGING64_ADDR_PT_LOBIT;
+    return 0;
+}
+\end{minted}
+
+\subsection{Câu hỏi đặt ra}
+\paragraph{Câu hỏi}: What are the benefits of extending hierarchical paging to N level?
+
+\paragraph{Trả lời}:
+\begin{itemize}
+    \item Kéo dài phân trang thành N cấp giúp tiết kiệm cực kỳ lớn không gian bộ nhớ vật lý dùng để lưu trữ bảng trang.
+    \item Với hệ thống 64-bit, nếu dùng bảng trang 1 cấp, kích thước bảng sẽ là khổng lồ và tràn khỏi bộ nhớ chính. Bằng cách phân cấp, hệ thống chỉ cần cấp phát động các bảng trang ở các mức độ thấp hơn (\textit{demand allocation}) cho những vùng địa chỉ đang thực sự được sử dụng.
+    \item Các entry không được ánh xạ sẽ trỏ về NULL, nhờ đó hệ thống không tốn dung lượng lưu trữ mảng không gian địa chỉ trống của tiến trình.
+\end{itemize}
+
+\pagebreak
+
+\section{Đồng bộ hóa (Synchronization)}
+
+\subsection{Giới thiệu chung}
+Hệ điều hành hỗ trợ chạy đa xử lý (multi-processing), vì vậy nhiều CPU có thể cùng lúc chọn tiến trình hoặc cấp phát bộ nhớ. Cần sử dụng cơ chế khóa (\texttt{pthread\_mutex\_t}) bao bọc các tài nguyên dùng chung.
+
+
+\subsection{Cơ chế bảo vệ tài nguyên dùng chung (Mutex Lock)}
+Việc truy cập, thêm bớt đối với các tài nguyên dùng chung như \texttt{mlq\_ready\_queue} luôn được bảo vệ bởi một khóa Mutex (\texttt{pthread\_mutex\_t}). Điển hình là khi thêm một tiến trình vào Queue ở hàm dưới đây:
+
+\begin{minted}{c}
+// From src/sched.c
+void add_mlq_proc(struct pcb_t * proc) {
+    proc->krnl->ready_queue = &ready_queue;
+    proc->krnl->mlq_ready_queue = mlq_ready_queue;
+    proc->krnl->running_list = &running_list;
+
+    pthread_mutex_lock(&queue_lock);
+    enqueue(&mlq_ready_queue[proc->prio], proc);
+    pthread_mutex_unlock(&queue_lock);	
+}
+\end{minted}
+
+\subsection{Câu hỏi đặt ra}
+\paragraph{Câu hỏi}: What happens if the synchronization is not handled in your Simple OS? Illustrate the problem of your simple OS (assignment outputs) by example if you have any in the added kernel memory operations.
+
+\paragraph{Trả lời}:
+\begin{itemize}
+    \item Nếu không có đồng bộ hóa, các hiện tượng ``race condition'' (tình trạng tranh chấp) sẽ xảy ra khi thao tác trên cấu trúc dữ liệu chung.
+    \item \textbf{Ví dụ minh họa (Lập lịch):} Nếu hai CPU cùng gọi hàm \texttt{dequeue} hoặc \texttt{get\_proc} mà hàng đợi không bị khóa, cả hai CPU có thể cùng trích xuất chung một con trỏ \texttt{pcb}. Hậu quả là tiến trình đó bị thực thi đồng thời trên hai vi xử lý khác nhau, ghi đè thanh ghi và phá vỡ logic chương trình.
+    \item \textbf{Ví dụ minh họa (Bộ nhớ):} Khi dùng \texttt{kmalloc}, OS cần lấy một khung nhớ trống (\texttt{free\_fp\_list}). Nếu thiếu khóa, hai CPU cùng đọc và được cấp chung một frame vật lý. Sau đó, tiến trình của CPU này sẽ ghi đè lên dữ liệu tiến trình CPU kia, làm sụp đổ toàn bộ Kernel.
+\end{itemize}
+
+\pagebreak
+
+\section{Kết luận}
+
+\subsection{Tổng kết kết quả đạt được}
+Thông qua quá trình triển khai dự án, nhóm đã xây dựng thành công và vận hành trơn tru các module cốt lõi của Simple OS. Hệ thống lập lịch MLQ hoạt động chính xác theo cơ chế chia sẻ time-slice dựa trên priority, điều phối tiến trình ưu tiên một cách hợp lý và hiệu quả. Bên cạnh đó, kiến trúc bộ nhớ ảo 64-bit sử dụng 5-level paging kết hợp segment đã giải quyết tối ưu vấn đề phân mảnh ngoài, bảo đảm quyền kiểm soát bộ nhớ nghiêm ngặt qua PID Passing. Các cơ chế Lock/Mutex cũng chứng minh tính ổn định tuyệt đối, không ghi nhận bất kỳ hiện tượng tranh chấp bộ nhớ nào trên môi trường đa lõi.
+
+\subsection{Hạn chế trong nghiên cứu}
+Mặc dù đã hoàn thiện các yêu cầu cơ bản, hệ thống mô phỏng vẫn tồn tại một số giới hạn nhất định:
+\begin{itemize}
+    \item Hệ thống chưa triển khai sâu các thuật toán thay thế trang (Page Replacement) nâng cao và tinh vi (như LRU, Clock) đối với bộ nhớ cấp hai, mà chủ yếu tập trung vào cơ chế ánh xạ cơ bản.
+    \item Thiết kế System call hiện tại vẫn khá đơn giản, chủ yếu hỗ trợ cấp phát bộ nhớ và chưa bao quát hết độ phức tạp của việc xử lý ngoại lệ ngắt từ thiết bị cứng (Hardware interrupt).
+\end{itemize}
+
+\subsection{Hướng phát triển trong tương lai}
+Để cải thiện hiệu suất và độ chân thực của Simple OS, các hướng phát triển tiếp theo có thể bao gồm:
+\begin{itemize}
+    \item Phát triển thêm module quản lý hệ thống tập tin (File System) chuẩn hóa để lưu trữ và truy xuất I/O thiết bị một cách bền vững thay vì sử dụng không gian nhớ ảo của hệ điều hành.
+    \item Tối ưu hóa bảng trang (Page Table) bằng cơ chế cấp phát động hoàn toàn (Demand Paging/Allocation) đối với mọi không gian để tối đa hóa hiệu suất bộ nhớ.
+    \item Bổ sung cấu trúc cây tiến trình và mở rộng giao thức liên lạc liên tiến trình (IPC - Inter-Process Communication).
+\end{itemize}
+
 \end{document}
