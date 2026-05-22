@@ -1,0 +1,529 @@
+==14317== Memcheck, a memory error detector
+==14317== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==14317== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==14317== Command: ./os os_2_singleCPU_mlq_paging
+==14317== 
+==14317== Thread 4:
+==14317== Conditional jump or move depends on uninitialised value(s)
+==14317==    at 0x10F2A4: get_free_vmrg_area (libmem.c:715)
+==14317==    by 0x10DDE4: __alloc (libmem.c:85)
+==14317==    by 0x10E12B: liballoc (libmem.c:179)
+==14317==    by 0x109725: run (cpu.c:79)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== Conditional jump or move depends on uninitialised value(s)
+==14317==    at 0x10C5AD: pte_set_fpn (mm64.c:191)
+==14317==    by 0x10CC32: vmap_page_range (mm64.c:359)
+==14317==    by 0x10CF5B: vm_map_ram (mm64.c:494)
+==14317==    by 0x10BFBF: inc_vma_limit (mm-vm.c:170)
+==14317==    by 0x10F459: __sys_memmap (sys_mem.c:69)
+==14317==    by 0x10F330: _syscall (syscalltbl.lst:2)
+==14317==    by 0x10DED1: __alloc (libmem.c:109)
+==14317==    by 0x10E12B: liballoc (libmem.c:179)
+==14317==    by 0x109725: run (cpu.c:79)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== Conditional jump or move depends on uninitialised value(s)
+==14317==    at 0x10C608: pte_set_fpn (mm64.c:195)
+==14317==    by 0x10CC32: vmap_page_range (mm64.c:359)
+==14317==    by 0x10CF5B: vm_map_ram (mm64.c:494)
+==14317==    by 0x10BFBF: inc_vma_limit (mm-vm.c:170)
+==14317==    by 0x10F459: __sys_memmap (sys_mem.c:69)
+==14317==    by 0x10F330: _syscall (syscalltbl.lst:2)
+==14317==    by 0x10DED1: __alloc (libmem.c:109)
+==14317==    by 0x10E12B: liballoc (libmem.c:179)
+==14317==    by 0x109725: run (cpu.c:79)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== Conditional jump or move depends on uninitialised value(s)
+==14317==    at 0x10C663: pte_set_fpn (mm64.c:199)
+==14317==    by 0x10CC32: vmap_page_range (mm64.c:359)
+==14317==    by 0x10CF5B: vm_map_ram (mm64.c:494)
+==14317==    by 0x10BFBF: inc_vma_limit (mm-vm.c:170)
+==14317==    by 0x10F459: __sys_memmap (sys_mem.c:69)
+==14317==    by 0x10F330: _syscall (syscalltbl.lst:2)
+==14317==    by 0x10DED1: __alloc (libmem.c:109)
+==14317==    by 0x10E12B: liballoc (libmem.c:179)
+==14317==    by 0x109725: run (cpu.c:79)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== Invalid write of size 4
+==14317==    at 0x10EA28: libkmem_cache_pool_create (libmem.c:482)
+==14317==    by 0x10976D: run (cpu.c:89)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317==  Address 0x4bf1440 is 0 bytes after a block of size 16 alloc'd
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D121: init_mm (mm64.c:564)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== Invalid write of size 4
+==14317==    at 0x10EA31: libkmem_cache_pool_create (libmem.c:483)
+==14317==    by 0x10976D: run (cpu.c:89)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317==  Address 0x4bf1444 is 4 bytes after a block of size 16 alloc'd
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D121: init_mm (mm64.c:564)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== Invalid write of size 8
+==14317==    at 0x10EA3C: libkmem_cache_pool_create (libmem.c:484)
+==14317==    by 0x10976D: run (cpu.c:89)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317==  Address 0x4bf1448 is 8 bytes after a block of size 16 alloc'd
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D121: init_mm (mm64.c:564)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== Invalid read of size 4
+==14317==    at 0x10EB13: __kmem_cache_alloc (libmem.c:520)
+==14317==    by 0x10EA9D: libkmem_cache_alloc (libmem.c:499)
+==14317==    by 0x10978F: run (cpu.c:92)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317==  Address 0x4bf1464 is 28 bytes before a block of size 32 in arena "client"
+==14317== 
+Time slot   0
+ld_routine
+Time slot   1
+	Loaded a process at input/proc/s3, PID: 1 PRIO: 3
+Time slot   2
+	CPU 0: Dispatched process  1
+Time slot   3
+	Loaded a process at input/proc/m2s, PID: 2 PRIO: 3
+Time slot   4
+	CPU 0: Put process  1 to run queue
+	CPU 0: Dispatched process  2
+DEBUG: fp=0x4b7eb90, fp->fpn=0, fp->fp_next=0x4b7ebf0
+DEBUG: fp=0x4b7ebf0, fp->fpn=1, fp->fp_next=0x4b7ec50
+liballoc:186
+print_pgtbl:
+ PDG=79621328 P4g=79628336 PUD=79628656 PMD=79628976
+Time slot   5
+	Loaded a process at input/proc/s2, PID: 3 PRIO: 3
+DEBUG: fp=0x4b7ec50, fp->fpn=2, fp->fp_next=0x4b7ecb0
+liballoc:186
+print_pgtbl:
+ PDG=79630992 P4g=79631680 PUD=79632000 PMD=79632320
+Time slot   6
+	CPU 0: Put process  2 to run queue
+	CPU 0: Dispatched process  2
+Time slot   7
+Time slot   8
+	CPU 0: Put process  2 to run queue
+	CPU 0: Dispatched process  2
+Time slot   9
+Time slot  10
+	CPU 0: Put process  2 to run queue
+	CPU 0: Dispatched process  2
+Time slot  11
+	Loaded a process at input/proc/m2s, PID: 4 PRIO: 2
+Time slot  12
+	CPU 0: Put process  2 to run queue
+	CPU 0: Dispatched process  4
+DEBUG: fp=0x4b7ecb0, fp->fpn=3, fp->fp_next=0x4b7ed10
+DEBUG: fp=0x4b7ed10, fp->fpn=4, fp->fp_next=0x4b7ed70
+liballoc:186
+print_pgtbl:
+ PDG=79640480 P4g=79641264 PUD=79641584 PMD=79641904
+Time slot  13
+DEBUG: fp=0x4b7ed70, fp->fpn=5, fp->fp_next=0x4b7edd0
+liballoc:186
+print_pgtbl:
+ PDG=79640480 P4g=79641264 PUD=79641584 PMD=79641904
+Time slot  14
+	CPU 0: Put process  4 to run queue
+	CPU 0: Dispatched process  4
+libfree:209
+print_pgtbl:
+ PDG=79640480 P4g=79641264 PUD=79641584 PMD=79641904
+Time slot  15
+Time slot  16
+	CPU 0: Put process  4 to run queue
+	CPU 0: Dispatched process  4
+	Loaded a process at input/proc/s1, PID: 5 PRIO: 0
+Time slot  17
+	CPU 0: Put process  4 to run queue
+	CPU 0: Dispatched process  5
+Time slot  18
+Time slot  19
+Time slot  20
+	CPU 0: Put process  5 to run queue
+	CPU 0: Dispatched process  5
+Time slot  21
+Time slot  22
+	CPU 0: Put process  5 to run queue
+	CPU 0: Dispatched process  5
+Time slot  23
+	CPU 0: Put process  5 to run queue
+	CPU 0: Dispatched process  5
+Time slot  24
+Time slot  25
+	CPU 0: Processed  5 has finished
+	CPU 0: Dispatched process  4
+Time slot  26
+Time slot  27
+	CPU 0: Put process  4 to run queue
+	CPU 0: Dispatched process  4
+Time slot  28
+Time slot  29
+	CPU 0: Put process  4 to run queue
+	CPU 0: Dispatched process  4
+Time slot  30
+Time slot  31
+	CPU 0: Processed  4 has finished
+	CPU 0: Dispatched process  2
+Time slot  32
+Time slot  33
+	CPU 0: Put process  2 to run queue
+	CPU 0: Dispatched process  2
+Time slot  34
+	CPU 0: Processed  2 has finished
+	CPU 0: Dispatched process  1
+Time slot  35
+Time slot  36
+	CPU 0: Put process  1 to run queue
+	CPU 0: Dispatched process  1
+Time slot  37
+Time slot  38
+Time slot  39
+	CPU 0: Put process  1 to run queue
+	CPU 0: Dispatched process  1
+Time slot  40
+	CPU 0: Put process  1 to run queue
+	CPU 0: Dispatched process  1
+Time slot  41
+Time slot  42
+Time slot  43
+	CPU 0: Put process  1 to run queue
+	CPU 0: Dispatched process  1
+Time slot  44
+	CPU 0: Processed  1 has finished
+	CPU 0: Dispatched process  3
+Time slot  45
+	CPU 0: Put process  3 to run queue
+	CPU 0: Dispatched process  3
+Time slot  46
+Time slot  47
+Time slot  48
+	CPU 0: Put process  3 to run queue
+	CPU 0: Dispatched process  3
+Time slot  49
+	CPU 0: Put process  3 to run queue
+	CPU 0: Dispatched process  3
+Time slot  50
+Time slot  51
+Time slot  52
+	CPU 0: Put process  3 to run queue
+	CPU 0: Dispatched process  3
+Time slot  53
+	CPU 0: Put process  3 to run queue
+	CPU 0: Dispatched process  3
+Time slot  54
+Time slot  55
+Time slot  56
+	CPU 0: Processed  3 has finished
+	CPU 0 stopped
+==14317== 
+==14317== HEAP SUMMARY:
+==14317==     in use at exit: 17,968,480 bytes in 4,425 blocks
+==14317==   total heap usage: 4,472 allocs, 47 frees, 18,004,778 bytes allocated
+==14317== 
+==14317== Thread 1:
+==14317== 8 bytes in 1 blocks are definitely lost in loss record 1 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10AF04: main (os.c:235)
+==14317== 
+==14317== 16 bytes in 1 blocks are still reachable in loss record 2 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D121: init_mm (mm64.c:564)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 16 bytes in 1 blocks are definitely lost in loss record 3 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10AF1F: main (os.c:237)
+==14317== 
+==14317== 32 bytes in 1 blocks are still reachable in loss record 4 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D180: init_vm_rg (mm64.c:575)
+==14317==    by 0x10D0BE: init_mm (mm64.c:548)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 32 bytes in 1 blocks are indirectly lost in loss record 5 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10E05A: __free (libmem.c:155)
+==14317==    by 0x10E1CA: libfree (libmem.c:204)
+==14317==    by 0x109809: run (cpu.c:104)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 40 bytes in 1 blocks are still reachable in loss record 6 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10AD0C: read_config (os.c:206)
+==14317==    by 0x10AEF0: main (os.c:233)
+==14317== 
+==14317== 48 bytes in 1 blocks are definitely lost in loss record 7 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10B047: main (os.c:265)
+==14317== 
+==14317== 56 bytes in 1 blocks are still reachable in loss record 8 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D04F: init_mm (mm64.c:530)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 64 bytes in 4 blocks are indirectly lost in loss record 9 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D121: init_mm (mm64.c:564)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 96 bytes in 6 blocks are indirectly lost in loss record 10 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D1FD: enlist_pgn_node (mm64.c:594)
+==14317==    by 0x10CC57: vmap_page_range (mm64.c:365)
+==14317==    by 0x10CF5B: vm_map_ram (mm64.c:494)
+==14317==    by 0x10BFBF: inc_vma_limit (mm-vm.c:170)
+==14317==    by 0x10F459: __sys_memmap (sys_mem.c:69)
+==14317==    by 0x10F330: _syscall (syscalltbl.lst:2)
+==14317==    by 0x10DED1: __alloc (libmem.c:109)
+==14317==    by 0x10E12B: liballoc (libmem.c:179)
+==14317==    by 0x109725: run (cpu.c:79)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317== 
+==14317== 128 bytes in 4 blocks are indirectly lost in loss record 11 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D180: init_vm_rg (mm64.c:575)
+==14317==    by 0x10D0BE: init_mm (mm64.c:548)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 224 bytes in 4 blocks are indirectly lost in loss record 12 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D04F: init_mm (mm64.c:530)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 256 bytes in 1 blocks are still reachable in loss record 13 of 36
+==14317==    at 0x484D953: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D062: init_mm (mm64.c:539)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 472 bytes in 1 blocks are still reachable in loss record 14 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x48EDE7E: __fopen_internal (iofopen.c:65)
+==14317==    by 0x48EDE7E: fopen@@GLIBC_2.2.5 (iofopen.c:86)
+==14317==    by 0x10ABBF: read_config (os.c:171)
+==14317==    by 0x10AEF0: main (os.c:233)
+==14317== 
+==14317== 768 bytes in 3 blocks are indirectly lost in loss record 15 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10C55D: pte_set_fpn (mm64.c:188)
+==14317==    by 0x10CC32: vmap_page_range (mm64.c:359)
+==14317==    by 0x10CF5B: vm_map_ram (mm64.c:494)
+==14317==    by 0x10BFBF: inc_vma_limit (mm-vm.c:170)
+==14317==    by 0x10F459: __sys_memmap (sys_mem.c:69)
+==14317==    by 0x10F330: _syscall (syscalltbl.lst:2)
+==14317==    by 0x10DED1: __alloc (libmem.c:109)
+==14317==    by 0x10E12B: liballoc (libmem.c:179)
+==14317==    by 0x109725: run (cpu.c:79)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317== 
+==14317== 768 bytes in 3 blocks are indirectly lost in loss record 16 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10C5B8: pte_set_fpn (mm64.c:192)
+==14317==    by 0x10CC32: vmap_page_range (mm64.c:359)
+==14317==    by 0x10CF5B: vm_map_ram (mm64.c:494)
+==14317==    by 0x10BFBF: inc_vma_limit (mm-vm.c:170)
+==14317==    by 0x10F459: __sys_memmap (sys_mem.c:69)
+==14317==    by 0x10F330: _syscall (syscalltbl.lst:2)
+==14317==    by 0x10DED1: __alloc (libmem.c:109)
+==14317==    by 0x10E12B: liballoc (libmem.c:179)
+==14317==    by 0x109725: run (cpu.c:79)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317== 
+==14317== 768 bytes in 3 blocks are indirectly lost in loss record 17 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10C613: pte_set_fpn (mm64.c:196)
+==14317==    by 0x10CC32: vmap_page_range (mm64.c:359)
+==14317==    by 0x10CF5B: vm_map_ram (mm64.c:494)
+==14317==    by 0x10BFBF: inc_vma_limit (mm-vm.c:170)
+==14317==    by 0x10F459: __sys_memmap (sys_mem.c:69)
+==14317==    by 0x10F330: _syscall (syscalltbl.lst:2)
+==14317==    by 0x10DED1: __alloc (libmem.c:109)
+==14317==    by 0x10E12B: liballoc (libmem.c:179)
+==14317==    by 0x109725: run (cpu.c:79)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317== 
+==14317== 768 bytes in 3 blocks are indirectly lost in loss record 18 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10C66E: pte_set_fpn (mm64.c:200)
+==14317==    by 0x10CC32: vmap_page_range (mm64.c:359)
+==14317==    by 0x10CF5B: vm_map_ram (mm64.c:494)
+==14317==    by 0x10BFBF: inc_vma_limit (mm-vm.c:170)
+==14317==    by 0x10F459: __sys_memmap (sys_mem.c:69)
+==14317==    by 0x10F330: _syscall (syscalltbl.lst:2)
+==14317==    by 0x10DED1: __alloc (libmem.c:109)
+==14317==    by 0x10E12B: liballoc (libmem.c:179)
+==14317==    by 0x109725: run (cpu.c:79)
+==14317==    by 0x10A842: cpu_routine (os.c:99)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317== 
+==14317== 1,024 bytes in 1 blocks are still reachable in loss record 19 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10AA67: ld_routine (os.c:149)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 1,024 bytes in 4 blocks are indirectly lost in loss record 20 of 36
+==14317==    at 0x484D953: calloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D062: init_mm (mm64.c:539)
+==14317==    by 0x10AA89: ld_routine (os.c:150)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 2,160 bytes in 5 blocks are indirectly lost in loss record 21 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10A0A5: load (loader.c:70)
+==14317==    by 0x10A9DE: ld_routine (os.c:139)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 2,240 (80 direct, 2,160 indirect) bytes in 5 blocks are definitely lost in loss record 22 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10A02E: load (loader.c:68)
+==14317==    by 0x10A9DE: ld_routine (os.c:139)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 2,360 bytes in 5 blocks are still reachable in loss record 23 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x48EDE7E: __fopen_internal (iofopen.c:65)
+==14317==    by 0x48EDE7E: fopen@@GLIBC_2.2.5 (iofopen.c:86)
+==14317==    by 0x109FBD: load (loader.c:62)
+==14317==    by 0x10A9DE: ld_routine (os.c:139)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 2,600 bytes in 5 blocks are definitely lost in loss record 24 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x109F71: load (loader.c:56)
+==14317==    by 0x10A9DE: ld_routine (os.c:139)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 4,096 bytes in 1 blocks are still reachable in loss record 25 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10A8A8: ld_routine (os.c:119)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 4,096 bytes in 1 blocks are still reachable in loss record 26 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10A8B9: ld_routine (os.c:120)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 4,096 bytes in 1 blocks are still reachable in loss record 27 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10A8CA: ld_routine (os.c:121)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 4,096 bytes in 1 blocks are still reachable in loss record 28 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10A8DB: ld_routine (os.c:122)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 4,096 bytes in 1 blocks are still reachable in loss record 29 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10A8EC: ld_routine (os.c:123)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 5,976 bytes in 249 blocks are indirectly lost in loss record 30 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D947: MEMPHY_format (mm-memphy.c:149)
+==14317==    by 0x10DBEC: init_memphy (mm-memphy.c:228)
+==14317==    by 0x10AFD4: main (os.c:257)
+==14317== 
+==14317== 6,000 (24 direct, 5,976 indirect) bytes in 1 blocks are definitely lost in loss record 31 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D947: MEMPHY_format (mm-memphy.c:149)
+==14317==    by 0x10DBEC: init_memphy (mm-memphy.c:228)
+==14317==    by 0x10AFD4: main (os.c:257)
+==14317== 
+==14317== 8,736 (4,096 direct, 4,640 indirect) bytes in 4 blocks are definitely lost in loss record 32 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10AA67: ld_routine (os.c:149)
+==14317==    by 0x4904AA3: start_thread (pthread_create.c:447)
+==14317==    by 0x4991A63: clone (clone.S:100)
+==14317== 
+==14317== 98,280 bytes in 4,095 blocks are indirectly lost in loss record 33 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D947: MEMPHY_format (mm-memphy.c:149)
+==14317==    by 0x10DBEC: init_memphy (mm-memphy.c:228)
+==14317==    by 0x10B02D: main (os.c:262)
+==14317== 
+==14317== 98,304 (24 direct, 98,280 indirect) bytes in 1 blocks are definitely lost in loss record 34 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10D90B: MEMPHY_format (mm-memphy.c:141)
+==14317==    by 0x10DBEC: init_memphy (mm-memphy.c:228)
+==14317==    by 0x10B02D: main (os.c:262)
+==14317== 
+==14317== 1,048,576 bytes in 1 blocks are definitely lost in loss record 35 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10DB59: init_memphy (mm-memphy.c:212)
+==14317==    by 0x10AFD4: main (os.c:257)
+==14317== 
+==14317== 16,777,216 bytes in 4 blocks are definitely lost in loss record 36 of 36
+==14317==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==14317==    by 0x10DB59: init_memphy (mm-memphy.c:212)
+==14317==    by 0x10B02D: main (os.c:262)
+==14317== 
+==14317== LEAK SUMMARY:
+==14317==    definitely lost: 17,832,688 bytes in 24 blocks
+==14317==    indirectly lost: 111,056 bytes in 4,384 blocks
+==14317==      possibly lost: 0 bytes in 0 blocks
+==14317==    still reachable: 24,736 bytes in 17 blocks
+==14317==         suppressed: 0 bytes in 0 blocks
+==14317== 
+==14317== Use --track-origins=yes to see where uninitialised values come from
+==14317== For lists of detected and suppressed errors, rerun with: -s
+==14317== ERROR SUMMARY: 31 errors from 18 contexts (suppressed: 0 from 0)

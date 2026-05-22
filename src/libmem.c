@@ -88,7 +88,9 @@ __alloc (struct pcb_t *caller, int vmaid, int rgid, addr_t size,
       caller->krnl->mm->symrgtbl[rgid].rg_end = rgnode.rg_end;
 
       *alloc_addr = rgnode.rg_start;
-
+      if (rgnode.rg_end > cur_vma->sbrk) {
+            cur_vma->sbrk = rgnode.rg_end;
+        }
       pthread_mutex_unlock (&mmvm_lock);
       return 0;
     }
@@ -181,7 +183,7 @@ liballoc (struct pcb_t *proc, addr_t size, uint32_t reg_index)
     return -1;
 
   }
-
+ proc->regs[reg_index] = addr;
 #ifdef IODUMP
   printf ("%s:%d\n", __func__, __LINE__);
 #ifdef PAGETBL_DUMP
@@ -472,18 +474,49 @@ int
 libkmem_cache_pool_create (struct pcb_t *caller, uint32_t size, uint32_t align,
                            uint32_t cache_pool_id)
 {
+  // struct krnl_t *krnl = caller->krnl;
+
+  // addr_t pool_addr;
+  // if (__kmalloc (caller, -1, -1, size, &pool_addr) != 0)
+  //   return -1;
+
+  // struct kcache_pool_struct *pool = &krnl->mm->kcpooltbl[cache_pool_id];
+  // if (size == 0 || align == 0) return -1;
+  //   if (size > 1024 * 1024 || align > 1024 * 1024) return -1;
+  // pool->size = size;
+  // pool->align = align;
+  // pool->storage = pool_addr;
+
+  // return 0;
+  /* TODO: provide OS level management */
+
   struct krnl_t *krnl = caller->krnl;
-
-  addr_t pool_addr;
-  if (__kmalloc (caller, -1, -1, size, &pool_addr) != 0)
-    return -1;
-
-  struct kcache_pool_struct *pool = &krnl->mm->kcpooltbl[cache_pool_id];
-  pool->size = size;
-  pool->align = align;
-  pool->storage = pool_addr;
-
-  return 0;
+    if (!krnl || !krnl->mm) return -1;
+    
+    // Kiểm tra giới hạn
+    if (cache_pool_id >= MAX_KMEM_POOL) {
+        printf("ERROR: cache_pool_id %d >= MAX_KMEM_POOL %d\n", cache_pool_id, MAX_KMEM_POOL);
+        return -1;
+    }
+    
+    // Kiểm tra bảng đã được cấp phát chưa
+    if (krnl->mm->kcpooltbl == NULL) {
+        printf("ERROR: kcpooltbl is NULL!\n");
+        return -1;
+    }
+    
+    struct kcache_pool_struct *pool = &krnl->mm->kcpooltbl[cache_pool_id];
+    
+    pool->size = size;
+    pool->align = align;
+    pool->storage = (addr_t)malloc(size * align);
+    
+    if (pool->storage == 0) return -1;
+    
+    printf("DEBUG: pool[%d] created: size=%u, align=%u, storage=%p\n", 
+           cache_pool_id, size, align, (void*)pool->storage);
+    
+    return 0;
 }
 
 /*libkmem_cache_alloc - allocate cache slot in cache pool
@@ -702,7 +735,9 @@ get_free_vmrg_area (struct pcb_t *caller, int vmaid, int size,
                     struct vm_rg_struct *newrg)
 {
   struct vm_area_struct *cur_vma = get_vma_by_num (caller->krnl->mm, vmaid);
-
+  if (cur_vma == NULL) {
+        return -1;  
+    }
   struct vm_rg_struct *rgit = cur_vma->vm_freerg_list;
 
   if (rgit == NULL)

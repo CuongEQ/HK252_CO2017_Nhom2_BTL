@@ -162,7 +162,6 @@ int MEMPHY_get_freefp(struct memphy_struct *mp, addr_t *retfpn)
 
    if (fp == NULL)
       return -1;
-
    *retfpn = fp->fpn;
    mp->free_fp_list = fp->fp_next;
 
@@ -203,9 +202,24 @@ int MEMPHY_put_freefp(struct memphy_struct *mp, addr_t fpn)
  */
 int init_memphy(struct memphy_struct *mp, addr_t max_size, int randomflg)
 {
+   // mp->storage = (BYTE *)malloc(max_size * sizeof(BYTE));
+   // mp->maxsz = max_size;
+   // memset(mp->storage, 0, max_size * sizeof(BYTE));
+   if (mp == NULL) return -1;
+   
    mp->storage = (BYTE *)malloc(max_size * sizeof(BYTE));
+   if (mp->storage == NULL) {
+      printf("DEBUG: init_memphy: malloc failed for size %lu\n", max_size);
+      return -1;
+   }
+   
    mp->maxsz = max_size;
    memset(mp->storage, 0, max_size * sizeof(BYTE));
+   
+   // Initialize free_fp_list to NULL before formatting
+   mp->free_fp_list = NULL;
+   mp->rdmflg = 0;
+   mp->cursor = 0;
 
 #ifdef MM64
 #define MM64_PAGESZ 4096   /* equivalent to PAGING64_PAGESZ */

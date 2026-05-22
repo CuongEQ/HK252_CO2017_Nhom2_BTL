@@ -185,19 +185,22 @@ struct krnl_t *krnl = caller->krnl;
   get_pd_from_pagenum(pgn, &pgd, &p4d, &pud, &pmd, &pt);
   addr_t *pgd_base= krnl->mm->pgd;
   if (pgd_base[pgd] == 0)
-    pgd_base[pgd] = (addr_t) malloc(PAGING_PAGESZ);
+    pgd_base[pgd] = (addr_t) calloc(1, PAGING_PAGESZ);
 
-  addr_t *p4d_base = (addr_t *) pgd_base[pgd];
-  if (p4d_base[p4d] == 0)
-      p4d_base[p4d] = (addr_t) malloc(PAGING_PAGESZ);
+addr_t *p4d_base = (addr_t *) pgd_base[pgd];
 
-  addr_t *pud_base = (addr_t *) p4d_base[p4d];
-  if (pud_base[pud] == 0)
-      pud_base[pud] = (addr_t) malloc(PAGING_PAGESZ);
+if (p4d_base[p4d] == 0)
+    p4d_base[p4d] = (addr_t) calloc(1, PAGING_PAGESZ);
 
-  addr_t *pmd_base = (addr_t *) pud_base[pud];
-  if (pmd_base[pmd] == 0)
-      pmd_base[pmd] = (addr_t) malloc(PAGING_PAGESZ);
+addr_t *pud_base = (addr_t *) p4d_base[p4d];
+
+if (pud_base[pud] == 0)
+    pud_base[pud] = (addr_t) calloc(1, PAGING_PAGESZ);
+
+addr_t *pmd_base = (addr_t *) pud_base[pud];
+
+if (pmd_base[pmd] == 0)
+    pmd_base[pmd] = (addr_t) calloc(1, PAGING_PAGESZ);
   addr_t *pt_base = (addr_t *) pmd_base[pmd];
 
   pte = &pt_base[pt];
@@ -367,6 +370,7 @@ addr_t pgn;
 
     fpit = fpit->fp_next;
     }
+    
   return 0;
 }
 
@@ -521,7 +525,8 @@ int __swap_cp_page(struct memphy_struct *mpsrc, addr_t srcfpn,
  */
 int init_mm(struct mm_struct *mm, struct pcb_t *caller)
 {
-  struct vm_area_struct *vma0 = malloc(sizeof(struct vm_area_struct));
+  struct vm_area_struct *vma0 =
+    calloc(1, sizeof(struct vm_area_struct));
 
   /* TODO init page table directory */
    //mm->pgd = ...
@@ -534,10 +539,11 @@ int init_mm(struct mm_struct *mm, struct pcb_t *caller)
         PAGING_PAGESZ / sizeof(addr_t),
         sizeof(addr_t)
     );
+    
   /* By default the owner comes with at least one vma */
   vma0->vm_id = 0;
   vma0->vm_start = 0;
-  vma0->vm_end = vma0->vm_start;
+  vma0->vm_end = PAGING_PAGESZ * 100;
   vma0->sbrk = vma0->vm_start;
   struct vm_rg_struct *first_rg = init_vm_rg(vma0->vm_start, vma0->vm_end);
   enlist_vm_rg_node(&vma0->vm_freerg_list, first_rg);
@@ -554,8 +560,9 @@ int init_mm(struct mm_struct *mm, struct pcb_t *caller)
   //mm->kcpooltbl
    memset(mm->symrgtbl, 0,
            sizeof(mm->symrgtbl));
-   mm->kcpooltbl =
-    malloc(sizeof(struct kcache_pool_struct));
+  //  mm->kcpooltbl =
+  //   malloc(sizeof(struct kcache_pool_struct));
+  mm->kcpooltbl = calloc(MAX_KMEM_POOL, sizeof(struct kcache_pool_struct));
 
     memset(mm->kcpooltbl, 0,
        sizeof(struct kcache_pool_struct)); 

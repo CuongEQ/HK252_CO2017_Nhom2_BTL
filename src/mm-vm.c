@@ -168,9 +168,12 @@ int inc_vma_limit(struct pcb_t *caller, int vmaid, addr_t inc_sz)
   struct vm_rg_struct *newrg = malloc(sizeof(struct vm_rg_struct));
 
  if (vm_map_ram(caller, old_end, new_end, 
-                  old_end, incnumpage , newrg) < 0)
-   return -1; /* Map the memory to MEMRAM */
+                  old_end, incnumpage , newrg) < 0){
+                    free(newrg);
+                    return -1; /* Map the memory to MEMRAM */
 
+                  }
+  free(newrg);  
   return 0;
 }
 
