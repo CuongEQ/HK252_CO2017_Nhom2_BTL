@@ -88,7 +88,9 @@ __alloc (struct pcb_t *caller, int vmaid, int rgid, addr_t size,
       caller->krnl->mm->symrgtbl[rgid].rg_end = rgnode.rg_end;
 
       *alloc_addr = rgnode.rg_start;
-
+      if (rgnode.rg_end > cur_vma->sbrk) {
+            cur_vma->sbrk = rgnode.rg_end;
+        }
       pthread_mutex_unlock (&mmvm_lock);
       return 0;
     }
